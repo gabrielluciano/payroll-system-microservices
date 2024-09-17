@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -22,6 +19,11 @@ import java.net.URI;
 public class EmployeeResource {
 
     private final EmployeeService service;
+
+    @GetMapping("{cpf}")
+    public ResponseEntity<EmployeeResponse> findByCpf(@PathVariable String cpf) {
+        return ResponseEntity.ok(service.findByCpf(cpf));
+    }
 
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody @Valid CreateEmployeeRequest body) {

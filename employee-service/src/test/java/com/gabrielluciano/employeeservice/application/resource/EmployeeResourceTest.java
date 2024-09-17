@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -192,5 +193,35 @@ class EmployeeResourceTest {
                 .andExpect(jsonPath("$.status", equalTo(HttpStatus.CONFLICT.value())))
                 .andExpect(jsonPath("$.error", equalTo("Duplicated Entity")))
                 .andExpect(jsonPath("$.message", containsString(createEmployeeRequest.cpf())));
+    }
+
+    @Test
+    @DisplayName("Should find employee by cpf")
+    void shouldFindEmployeeByCpf() throws Exception {
+        Position position = positionRepository.saveAndFlush(new Position(null, "Software Developer"));
+        CreateEmployeeRequest createEmployeeRequest = new CreateEmployeeRequest("John", VALID_CPF,
+                BigDecimal.valueOf(2000.01), position.getId());
+        Employee employee = createEmployeeRequest.toModel();
+        employee.setPosition(position);
+        employeeRepository.saveAndFlush(employee);
+
+        mockMvc.perform(get("/employees/" + employee.getCpf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", equalTo(employee.getName())))
+                .andExpect(jsonPath("$.cpf", equalTo(employee.getCpf())))
+                .andExpect(jsonPath("$.position.name", equalTo(employee.getPosition().getName())));
+    }
+
+    @Test
+    @DisplayName("Should not find employee by cpf")
+    void shouldNotFindEmployeeByCpf() throws Exception {
+        mockMvc.perform(get("/employees/" + VALID_CPF))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/employees/" + VALID_CPF)))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("Employee")));
     }
 }

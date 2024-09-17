@@ -23,6 +23,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final PositionRepository positionRepository;
 
     @Override
+    public EmployeeResponse findByCpf(String cpf) throws EntityNotFoundException {
+        return employeeRepository.findByCpf(cpf)
+                .map(EmployeeResponse::fromModel)
+                .orElseThrow(() -> new EntityNotFoundException(cpf, Employee.class));
+    }
+
+    @Override
     @Transactional
     public EmployeeResponse save(CreateEmployeeRequest createEmployeeRequest) {
         Optional<Employee> employeeFromDb = employeeRepository.findByCpf(createEmployeeRequest.cpf());
