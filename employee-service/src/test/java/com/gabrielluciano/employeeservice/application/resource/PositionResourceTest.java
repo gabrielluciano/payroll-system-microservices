@@ -2,6 +2,7 @@ package com.gabrielluciano.employeeservice.application.resource;
 
 import com.gabrielluciano.employeeservice.config.TestcontainersConfiguration;
 import com.gabrielluciano.employeeservice.domain.dto.CreatePositionRequest;
+import com.gabrielluciano.employeeservice.domain.model.Position;
 import com.gabrielluciano.employeeservice.infra.repository.PositionRepository;
 import com.gabrielluciano.employeeservice.util.JsonUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,21 +16,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 
+import static com.gabrielluciano.employeeservice.util.TestUtils.executeConcurrently;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -72,10 +70,10 @@ class PositionResourceTest {
                         .content(JsonUtils.asJsonString(createPositionRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.path", equalTo("/positions")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error", equalTo("Data Integrity Violation")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", containsString("duplicate")));
+                .andExpect(jsonPath("$.path", equalTo("/positions")))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.value())))
+                .andExpect(jsonPath("$.error", equalTo("Data Integrity Violation")))
+                .andExpect(jsonPath("$.message", containsString("duplicate")));
 
         assertThat(positionRepository.count()).isEqualTo(1);
     }
@@ -90,10 +88,10 @@ class PositionResourceTest {
                         .content(JsonUtils.asJsonString(createPositionRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.path", equalTo("/positions")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error", equalTo("Constraint Violation")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", containsString("name")));
+                .andExpect(jsonPath("$.path", equalTo("/positions")))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.value())))
+                .andExpect(jsonPath("$.error", equalTo("Constraint Violation")))
+                .andExpect(jsonPath("$.message", containsString("name")));
     }
 
     @Test
@@ -109,25 +107,17 @@ class PositionResourceTest {
         assertThat(positionRepository.count()).isEqualTo(1);
     }
 
-    private int executeConcurrently(int times, Callable callable) {
-        AtomicInteger numberOfExecutions = new AtomicInteger();
-        try (var executorService = Executors.newVirtualThreadPerTaskExecutor()) {
-            CountDownLatch latch = new CountDownLatch(times);
-            for (int i = 0; i < times; i++) {
-                executorService.submit(() -> {
-                    try {
-                        callable.call();
-                        numberOfExecutions.getAndIncrement();
-                        latch.countDown();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-            latch.await();
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
-        return numberOfExecutions.get();
+    @Test
+    @DisplayName("Should return list of positions")
+    void shouldReturnListOfPositions() throws Exception {
+        positionRepository.saveAllAndFlush(List.of(
+                new Position(null, "Software Developer"),
+                new Position(null, "Business Analyst")
+        ));
+
+        mockMvc.perform(get("/positions"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", equalTo(2)));
     }
 }
