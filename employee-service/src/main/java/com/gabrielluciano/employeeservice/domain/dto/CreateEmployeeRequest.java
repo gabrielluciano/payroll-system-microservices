@@ -4,9 +4,9 @@ import com.gabrielluciano.employeeservice.domain.model.Employee;
 
 import java.math.BigDecimal;
 
-public record CreateEmployeeRequest(String name, String cpf, Double baseSalary, Long positionId) {
+public record CreateEmployeeRequest(String name, String cpf, BigDecimal baseSalary, Long positionId) {
 
     public Employee toModel() {
-        return new Employee(cpf, name, BigDecimal.valueOf(baseSalary), null);
+        return new Employee(cpf, name, baseSalary, null);
     }
 }
