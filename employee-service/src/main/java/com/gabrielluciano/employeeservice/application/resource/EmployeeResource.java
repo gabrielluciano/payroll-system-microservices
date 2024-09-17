@@ -2,6 +2,7 @@ package com.gabrielluciano.employeeservice.application.resource;
 
 import com.gabrielluciano.employeeservice.domain.dto.CreateEmployeeRequest;
 import com.gabrielluciano.employeeservice.domain.dto.EmployeeResponse;
+import com.gabrielluciano.employeeservice.domain.dto.UpdateEmployeeRequest;
 import com.gabrielluciano.employeeservice.domain.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,14 @@ public class EmployeeResource {
         EmployeeResponse employee = service.save(body);
         log.info("Successfully created employee with cpf '{}'", employee.cpf());
         return ResponseEntity.created(createLocation(employee)).build();
+    }
+
+    @PutMapping("{cpf}")
+    public ResponseEntity<Void> update(@PathVariable String cpf, @RequestBody @Valid UpdateEmployeeRequest body) {
+        log.info("Received update employee request");
+        EmployeeResponse employee = service.update(cpf, body);
+        log.info("Successfully updated employee with cpf '{}'", employee.cpf());
+        return ResponseEntity.ok().build();
     }
 
     private URI createLocation(EmployeeResponse employeeResponse) {

@@ -2,6 +2,7 @@ package com.gabrielluciano.employeeservice.domain.service.impl;
 
 import com.gabrielluciano.employeeservice.domain.dto.CreateEmployeeRequest;
 import com.gabrielluciano.employeeservice.domain.dto.EmployeeResponse;
+import com.gabrielluciano.employeeservice.domain.dto.UpdateEmployeeRequest;
 import com.gabrielluciano.employeeservice.domain.exception.DuplicatedEntityException;
 import com.gabrielluciano.employeeservice.domain.exception.EntityNotFoundException;
 import com.gabrielluciano.employeeservice.domain.model.Employee;
@@ -41,6 +42,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Employee employee = createEmployeeRequest.toModel();
         employee.setPosition(position);
-        return EmployeeResponse.fromModel(employeeRepository.saveAndFlush(employee));
+        return EmployeeResponse.fromModel(employeeRepository.save(employee));
+    }
+
+    @Override
+    @Transactional
+    public EmployeeResponse update(String cpf, UpdateEmployeeRequest updateEmployeeRequest) {
+        Employee employee = employeeRepository.findByCpf(cpf)
+                .orElseThrow(() -> new EntityNotFoundException(cpf, Employee.class));
+        Position position = positionRepository.findById(updateEmployeeRequest.positionId())
+                .orElseThrow(() -> new EntityNotFoundException(updateEmployeeRequest.positionId(), Position.class));
+
+        employee.setName(updateEmployeeRequest.name());
+        employee.setBaseSalary(updateEmployeeRequest.baseSalary());
+        employee.setPosition(position);
+
+        return EmployeeResponse.fromModel(employeeRepository.save(employee));
     }
 }

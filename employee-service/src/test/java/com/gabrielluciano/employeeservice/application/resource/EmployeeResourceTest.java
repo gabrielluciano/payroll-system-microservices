@@ -2,6 +2,7 @@ package com.gabrielluciano.employeeservice.application.resource;
 
 import com.gabrielluciano.employeeservice.config.TestcontainersConfiguration;
 import com.gabrielluciano.employeeservice.domain.dto.CreateEmployeeRequest;
+import com.gabrielluciano.employeeservice.domain.dto.UpdateEmployeeRequest;
 import com.gabrielluciano.employeeservice.domain.model.Employee;
 import com.gabrielluciano.employeeservice.domain.model.Position;
 import com.gabrielluciano.employeeservice.infra.repository.EmployeeRepository;
@@ -21,10 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -223,5 +224,64 @@ class EmployeeResourceTest {
                 .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
                 .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
                 .andExpect(jsonPath("$.message", containsString("Employee")));
+    }
+
+    @Test
+    @DisplayName("Should update employee")
+    void shouldUpdateEmployee() throws Exception {
+        Position position1 = positionRepository.saveAndFlush(new Position(null, "Software Developer"));
+        Position position2 = positionRepository.saveAndFlush(new Position(null, "Quality Assurance Analyst"));
+        Employee employee = employeeRepository.saveAndFlush(new Employee(VALID_CPF, "John", BigDecimal.valueOf(2000.01), position1));
+
+        var updateEmployeeRequest = new UpdateEmployeeRequest("Jack", BigDecimal.valueOf(5000.01), position2.getId());
+
+        mockMvc.perform(put("/employees/" + employee.getCpf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.asJsonString(updateEmployeeRequest)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Employee updatedEmployee = employeeRepository.findByCpf(employee.getCpf()).get();
+
+        assertThat(updatedEmployee.getName()).isEqualTo(updateEmployeeRequest.name());
+        assertThat(updatedEmployee.getBaseSalary()).isEqualTo(updateEmployeeRequest.baseSalary());
+        assertThat(updatedEmployee.getPosition().getId()).isEqualTo(updateEmployeeRequest.positionId());
+    }
+
+    @Test
+    @DisplayName("Should return not found when updating employee that does not exist")
+    void shouldReturnNotFoundWhenUpdatingEmployeeThatDoesNotExist() throws Exception {
+        Position position = positionRepository.saveAndFlush(new Position(null, "Software Developer"));
+
+        var updateEmployeeRequest = new UpdateEmployeeRequest("Jack", BigDecimal.valueOf(5000.01), position.getId());
+
+        mockMvc.perform(put("/employees/" + VALID_CPF)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.asJsonString(updateEmployeeRequest)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/employees/" + VALID_CPF)))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("Employee")));
+    }
+
+    @Test
+    @DisplayName("Should return not found when updating employee and position does not exist")
+    void shouldReturnNotFoundWhenUpdatingEmployeeAndPositionDoesNotExist() throws Exception {
+        Position position = positionRepository.saveAndFlush(new Position(null, "Software Developer"));
+        employeeRepository.saveAndFlush(new Employee(VALID_CPF, "John", BigDecimal.valueOf(2000.01), position));
+
+        var updateEmployeeRequest = new UpdateEmployeeRequest("Jack", BigDecimal.valueOf(5000.01), position.getId() + 1);
+
+        mockMvc.perform(put("/employees/" + VALID_CPF)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.asJsonString(updateEmployeeRequest)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/employees/" + VALID_CPF)))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("Position")));
     }
 }
