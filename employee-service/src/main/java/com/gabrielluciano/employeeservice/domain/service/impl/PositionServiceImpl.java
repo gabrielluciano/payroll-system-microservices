@@ -2,7 +2,6 @@ package com.gabrielluciano.employeeservice.domain.service.impl;
 
 import com.gabrielluciano.employeeservice.domain.dto.CreatePositionRequest;
 import com.gabrielluciano.employeeservice.domain.dto.PositionResponse;
-import com.gabrielluciano.employeeservice.domain.model.Position;
 import com.gabrielluciano.employeeservice.domain.service.PositionService;
 import com.gabrielluciano.employeeservice.infra.repository.PositionRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     @Transactional
-    public Position save(CreatePositionRequest createPositionRequest) {
-        return repository.save(createPositionRequest.toModel());
+    public PositionResponse save(CreatePositionRequest createPositionRequest) {
+        return PositionResponse.fromModel(repository.save(createPositionRequest.toModel()));
     }
 }

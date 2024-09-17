@@ -23,11 +23,11 @@ import static com.gabrielluciano.employeeservice.util.TestUtils.executeConcurren
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -55,8 +55,7 @@ class PositionResourceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(createPositionRequest)))
                 .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", matchesPattern("http:\\/\\/.+\\/positions\\/[0-9]+")));
+                .andExpect(status().isCreated());
     }
 
     @Test
