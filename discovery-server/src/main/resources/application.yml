@@ -5,6 +5,12 @@ spring:
 server:
   port: 8761
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env,caches,threaddump,logfile"
+
 eureka:
   instance:
     hostname: localhost
