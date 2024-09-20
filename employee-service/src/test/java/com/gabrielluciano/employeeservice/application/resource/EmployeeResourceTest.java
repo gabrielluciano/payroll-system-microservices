@@ -239,7 +239,7 @@ class EmployeeResourceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(updateEmployeeRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Employee updatedEmployee = employeeRepository.findByCpf(employee.getCpf()).get();
 
