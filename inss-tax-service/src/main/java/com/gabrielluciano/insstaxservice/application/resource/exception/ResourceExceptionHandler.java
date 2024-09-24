@@ -1,5 +1,6 @@
 package com.gabrielluciano.insstaxservice.application.resource.exception;
 
+import com.gabrielluciano.insstaxservice.domain.exception.EntityNotFoundException;
 import com.gabrielluciano.insstaxservice.domain.exception.InvalidTaxRateException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -65,5 +66,19 @@ public class ResourceExceptionHandler {
                 .build();
         log.info("Invalid Tax Rate. Error details: {}", error);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<StandardError> handleEntityNotFoundException(EntityNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        var error = StandardError.builder()
+                .error("Entity Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .build();
+        log.info("Entity Not Found. Id: {}", ex.getId());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

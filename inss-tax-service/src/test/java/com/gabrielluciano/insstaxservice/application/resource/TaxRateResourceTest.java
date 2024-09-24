@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,8 +23,7 @@ import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -213,5 +213,32 @@ class TaxRateResourceTest {
                 .andExpect(jsonPath("$.[0].minimumSalaryThreshold", equalTo(0.00)))
                 .andExpect(jsonPath("$.[1].minimumSalaryThreshold", equalTo(1001.00)))
                 .andExpect(jsonPath("$.[2].minimumSalaryThreshold", equalTo(2001.00)));
+    }
+
+    @Test
+    @DisplayName("Should delete tax rate")
+    void shouldDeleteTaxRate() throws Exception {
+        TaxRate taxRate = repository.saveAndFlush(new TaxRate(null, valueOf(1001.00), valueOf(2000.00), valueOf(0.05)));
+        assertThat(repository.count()).isOne();
+
+        mockMvc.perform(delete("/inss/tax-rate/{id}", taxRate.getId()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        assertThat(repository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("Should return not found when deleting non existent tax rate")
+    void shouldReturnNotFoundWhenDeletingNonExistentTaxRate() throws Exception {
+        long id = 2L;
+
+        mockMvc.perform(delete("/inss/tax-rate/{id}", id))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/inss/tax-rate/" + id)))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("TaxRate")));
     }
 }

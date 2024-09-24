@@ -10,4 +10,6 @@ public interface TaxRateService {
     Long save(CreateTaxRateRequest createTaxRateRequest);
 
     List<TaxRateResponse> list();
+
+    void deleteById(Long id);
 }

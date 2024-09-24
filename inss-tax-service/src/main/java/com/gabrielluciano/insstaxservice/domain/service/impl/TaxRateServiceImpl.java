@@ -2,6 +2,7 @@ package com.gabrielluciano.insstaxservice.domain.service.impl;
 
 import com.gabrielluciano.insstaxservice.domain.dto.CreateTaxRateRequest;
 import com.gabrielluciano.insstaxservice.domain.dto.TaxRateResponse;
+import com.gabrielluciano.insstaxservice.domain.exception.EntityNotFoundException;
 import com.gabrielluciano.insstaxservice.domain.exception.InvalidTaxRateException;
 import com.gabrielluciano.insstaxservice.domain.model.TaxRate;
 import com.gabrielluciano.insstaxservice.domain.service.TaxRateService;
@@ -34,5 +35,12 @@ public class TaxRateServiceImpl implements TaxRateService {
                 .sorted()
                 .map(TaxRateResponse::fromModel)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id, TaxRate.class));
+        repository.deleteById(id);
     }
 }

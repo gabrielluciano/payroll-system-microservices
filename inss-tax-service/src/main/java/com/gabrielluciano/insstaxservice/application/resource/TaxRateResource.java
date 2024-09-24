@@ -34,4 +34,11 @@ public class TaxRateResource {
     public ResponseEntity<List<TaxRateResponse>> list() {
         return ResponseEntity.ok(service.list());
     }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        service.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
