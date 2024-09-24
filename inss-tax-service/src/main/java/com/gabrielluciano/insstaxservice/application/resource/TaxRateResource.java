@@ -38,7 +38,9 @@ public class TaxRateResource {
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        log.info("Received delete tax rate request");
         service.deleteById(id);
+        log.info("Successfully deleted tax rate with id '{}'", id);
         return ResponseEntity.noContent().build();
     }
 }
