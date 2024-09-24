@@ -39,7 +39,7 @@ public class TaxRate implements Comparable<TaxRate> {
 
     @NotNull
     @Positive
-    @DecimalMax("100.0")
+    @DecimalMax("1.0")
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal rate;
 

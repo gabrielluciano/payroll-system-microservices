@@ -182,9 +182,9 @@ class TaxRateResourceTest {
     }
 
     @Test
-    @DisplayName("Should not save tax rate with rate greater than 100.0")
-    void shouldNotSaveTaxRateWithRateGreaterThan100dot0() throws Exception {
-        var request = new CreateTaxRateRequest(BigDecimal.valueOf(0), BigDecimal.valueOf(2000.00), BigDecimal.valueOf(100.1));
+    @DisplayName("Should not save tax rate with rate greater than 1.0")
+    void shouldNotSaveTaxRateWithRateGreaterThan1dot0() throws Exception {
+        var request = new CreateTaxRateRequest(BigDecimal.valueOf(0), BigDecimal.valueOf(2000.00), BigDecimal.valueOf(1.1));
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request)))
