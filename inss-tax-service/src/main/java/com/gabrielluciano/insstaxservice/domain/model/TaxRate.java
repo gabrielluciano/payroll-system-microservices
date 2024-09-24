@@ -1,6 +1,5 @@
 package com.gabrielluciano.insstaxservice.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,16 +23,20 @@ public class TaxRate implements Comparable<TaxRate> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
     private Long id;
     @Column(nullable = false, unique = true, precision = 10, scale = 2)
+    private BigDecimal minimumSalaryThreshold;
+    @Column(nullable = false, unique = true, precision = 10, scale = 2)
     private BigDecimal maximumSalaryThreshold;
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal rate;
 
-    @OneToOne
-    @JsonIgnore
-    private TaxRate previousTaxRate;
+    public TaxRate(BigDecimal minimumSalaryThreshold, BigDecimal maximumSalaryThreshold, BigDecimal rate) {
+        this.minimumSalaryThreshold = minimumSalaryThreshold;
+        this.maximumSalaryThreshold = maximumSalaryThreshold;
+        this.rate = rate;
+    }
 
     @Override
     public int compareTo(TaxRate o) {
-        return maximumSalaryThreshold.compareTo(o.maximumSalaryThreshold);
+        return minimumSalaryThreshold.compareTo(o.minimumSalaryThreshold);
     }
 }
