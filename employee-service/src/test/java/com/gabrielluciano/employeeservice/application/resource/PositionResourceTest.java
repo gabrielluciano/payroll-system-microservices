@@ -56,6 +56,8 @@ class PositionResourceTest {
                         .content(JsonUtils.asJsonString(createPositionRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated());
+
+        assertThat(positionRepository.count()).isEqualTo(1L);
     }
 
     @Test

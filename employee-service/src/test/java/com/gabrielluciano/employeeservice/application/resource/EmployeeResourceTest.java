@@ -66,6 +66,8 @@ class EmployeeResourceTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", containsString(createEmployeeRequest.cpf())));
+
+        assertThat(employeeRepository.count()).isEqualTo(1L);
     }
 
     @Test
