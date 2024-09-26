@@ -72,7 +72,7 @@ class TaxRateResourceTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        assertThat(repository.count()).isEqualTo(1L);
+        assertThat(repository.count()).isOne();
     }
 
     @Test
@@ -92,7 +92,7 @@ class TaxRateResourceTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        assertThat(repository.count()).isEqualTo(1L);
+        assertThat(repository.count()).isOne();
     }
 
     @Test
