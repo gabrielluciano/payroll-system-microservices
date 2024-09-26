@@ -11,7 +11,7 @@ spring:
     show-sql: true
 
 server:
-  port: 0 # random port
+  port: 8080 # random port
 
 management:
   endpoints:
