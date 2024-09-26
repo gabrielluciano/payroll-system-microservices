@@ -13,13 +13,17 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -166,5 +170,50 @@ class TaxRateResourceTest {
                 .andExpect(jsonPath("$.message", containsString("rate")));
 
         assertThat(repository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("Should return list of tax rates")
+    void shouldReturnListOfTaxRates() throws Exception {
+        repository.saveAllAndFlush(List.of(
+                new TaxRate(null, valueOf(0.00), valueOf(1000.00), valueOf(0.02), valueOf(0.00)),
+                new TaxRate(null, valueOf(2001.00), valueOf(3000.00), valueOf(0.07), valueOf(100.00)),
+                new TaxRate(null, valueOf(1001.00), valueOf(2000.00), valueOf(0.05), valueOf(50.00))
+        ));
+
+        mockMvc.perform(get("/income/tax-rate"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", equalTo(3)))
+                .andExpect(jsonPath("$.[0].minimumSalaryThreshold", equalTo(0.00)))
+                .andExpect(jsonPath("$.[1].minimumSalaryThreshold", equalTo(1001.00)))
+                .andExpect(jsonPath("$.[2].minimumSalaryThreshold", equalTo(2001.00)));
+    }
+
+    @Test
+    @DisplayName("Should delete tax rate")
+    void shouldDeleteTaxRate() throws Exception {
+        TaxRate taxRate = repository.saveAndFlush(new TaxRate(null, valueOf(1001.00), valueOf(2000.00), valueOf(0.05), valueOf(100.00)));
+        assertThat(repository.count()).isOne();
+
+        mockMvc.perform(delete("/income/tax-rate/{id}", taxRate.getId()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        assertThat(repository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("Should return not found when deleting non existent tax rate")
+    void shouldReturnNotFoundWhenDeletingNonExistentTaxRate() throws Exception {
+        long id = 2L;
+
+        mockMvc.perform(delete("/income/tax-rate/{id}", id))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/income/tax-rate/" + id)))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("TaxRate")));
     }
 }
