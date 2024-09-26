@@ -56,7 +56,7 @@ class TaxRateResourceTest {
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        assertThat(repository.count()).isEqualTo(1L);
+        assertThat(repository.count()).isOne();
     }
 
     @Test
@@ -75,7 +75,7 @@ class TaxRateResourceTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        assertThat(repository.count()).isEqualTo(1L);
+        assertThat(repository.count()).isOne();
     }
 
     @Test
@@ -94,106 +94,77 @@ class TaxRateResourceTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        assertThat(repository.count()).isEqualTo(1L);
+        assertThat(repository.count()).isOne();
     }
 
     @Test
-    @DisplayName("Should not save tax rate with null minimum or maximum salary thresholds")
-    void shouldNotSaveTaxRateWithNullMinimumOrMaximumSalaryThresholds() throws Exception {
-        var request = new CreateTaxRateRequest(null, null, valueOf(0.02));
+    @DisplayName("Should not save tax rate with null attributes")
+    void shouldNotSaveTaxRateWithNullAttributes() throws Exception {
+        var request = new CreateTaxRateRequest(null, null, null);
+
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("Invalid thresholds")));
+                .andExpect(jsonPath("$.message", containsString("minimumSalaryThreshold")))
+                .andExpect(jsonPath("$.message", containsString("maximumSalaryThreshold")))
+                .andExpect(jsonPath("$.message", containsString("rate")));
 
         assertThat(repository.count()).isZero();
     }
 
     @Test
-    @DisplayName("Should not save tax rate with negative minimum or maximum salary threshold")
-    void shouldNotSaveTaxRateWithNegativeMinimumOrMaximumSalaryThresholds() throws Exception {
-        var request = new CreateTaxRateRequest(valueOf(-100.00), valueOf(-200.00), valueOf(0.02));
+    @DisplayName("Should not save tax rate with negative attributes")
+    void shouldNotSaveTaxRateWithNegativeAttributes() throws Exception {
+        var request = new CreateTaxRateRequest(valueOf(-100.0), valueOf(-200.0), valueOf(-0.05));
+
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("Invalid thresholds")));
+                .andExpect(jsonPath("$.message", containsString("minimumSalaryThreshold")))
+                .andExpect(jsonPath("$.message", containsString("maximumSalaryThreshold")))
+                .andExpect(jsonPath("$.message", containsString("rate")));
 
         assertThat(repository.count()).isZero();
     }
 
     @Test
-    @DisplayName("Should not save tax rate when minimum is greater or equal than maximum threshold")
-    void shouldNotSaveTaxRateWhenMinimumIsGreaterOrEqualThanMaximumThreshold() throws Exception {
-        var request1 = new CreateTaxRateRequest(valueOf(200.00), valueOf(100.00), valueOf(0.02));
+    @DisplayName("Should not save tax rate when minimumSalaryThreshold is not less than maximumSalaryThreshold")
+    void shouldNotSaveTaxRateWhenMinimumSalaryThresholdIsNotLessThanMaximumSalaryThreshold() throws Exception {
+        var request1 = new CreateTaxRateRequest(valueOf(100.00), valueOf(100.00), valueOf(0.02));
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request1)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("Invalid thresholds")));
+                .andExpect(jsonPath("$.message", containsString("invalid thresholds")));
         assertThat(repository.count()).isZero();
 
-        var request2 = new CreateTaxRateRequest(valueOf(100.00), valueOf(100.00), valueOf(0.02));
+        var request2 = new CreateTaxRateRequest(valueOf(200.00), valueOf(100.00), valueOf(0.02));
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request2)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("Invalid thresholds")));
-        assertThat(repository.count()).isZero();
-    }
-
-    @Test
-    @DisplayName("Should not save tax rate with null rate")
-    void shouldNotSaveTaxRateWithNullRate() throws Exception {
-        var request = new CreateTaxRateRequest(valueOf(0), valueOf(2000.00), null);
-
-        mockMvc.perform(post("/inss/tax-rate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonUtils.asJsonString(request)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("rate")));
-
-        assertThat(repository.count()).isZero();
-    }
-
-    @Test
-    @DisplayName("Should not save tax rate with not positive rate")
-    void shouldNotSaveTaxRateWithNotPositiveRate() throws Exception {
-        var request1 = new CreateTaxRateRequest(valueOf(0), valueOf(2000.00), valueOf(0.0));
-        mockMvc.perform(post("/inss/tax-rate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonUtils.asJsonString(request1)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("rate")));
-        assertThat(repository.count()).isZero();
-
-        var request2 = new CreateTaxRateRequest(valueOf(0), valueOf(2000.00), valueOf(-0.1));
-        mockMvc.perform(post("/inss/tax-rate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonUtils.asJsonString(request2)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", containsString("rate")));
+                .andExpect(jsonPath("$.message", containsString("invalid thresholds")));
         assertThat(repository.count()).isZero();
     }
 
     @Test
     @DisplayName("Should not save tax rate with rate greater than 1.0")
     void shouldNotSaveTaxRateWithRateGreaterThan1dot0() throws Exception {
-        var request = new CreateTaxRateRequest(valueOf(0), valueOf(2000.00), valueOf(1.1));
+        var request = new CreateTaxRateRequest(valueOf(100.0), valueOf(200.0), valueOf(10.05));
+
         mockMvc.perform(post("/inss/tax-rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonUtils.asJsonString(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("rate")));
+
         assertThat(repository.count()).isZero();
     }
 

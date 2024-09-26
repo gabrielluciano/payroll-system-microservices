@@ -1,10 +1,10 @@
 package com.gabrielluciano.insstaxservice.domain.model;
 
+import com.gabrielluciano.insstaxservice.domain.validation.ValidThresholds;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ValidThresholds
 public class TaxRate implements Comparable<TaxRate> {
 
     public static final String SEQUENCE_NAME = "sequence_tax_rate";
@@ -38,7 +39,7 @@ public class TaxRate implements Comparable<TaxRate> {
     private BigDecimal maximumSalaryThreshold;
 
     @NotNull
-    @Positive
+    @DecimalMin("0.0")
     @DecimalMax("1.0")
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal rate;
@@ -52,13 +53,5 @@ public class TaxRate implements Comparable<TaxRate> {
     @Override
     public int compareTo(TaxRate o) {
         return minimumSalaryThreshold.compareTo(o.minimumSalaryThreshold);
-    }
-
-    public boolean hasValidThresholds() {
-        return (minimumSalaryThreshold != null
-                && maximumSalaryThreshold != null
-                && minimumSalaryThreshold.compareTo(BigDecimal.valueOf(0.0)) >= 0
-                && maximumSalaryThreshold.compareTo(BigDecimal.valueOf(0.0)) > 0
-                && minimumSalaryThreshold.compareTo(maximumSalaryThreshold) < 0);
     }
 }
