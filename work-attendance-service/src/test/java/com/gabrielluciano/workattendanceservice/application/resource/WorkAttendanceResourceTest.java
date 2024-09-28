@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -200,5 +201,39 @@ class WorkAttendanceResourceTest {
                 ));
 
         assertThat(repository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("Should find by employeeCpf, year and month")
+    void shouldFindByEmployeeCpfYearAndMonth() throws Exception {
+        int year = 2024;
+        int month = 10;
+        var id = new WorkAttendanceRecordId(VALID_CPF, 2024, 10);
+        var record = repository.saveAndFlush(new WorkAttendanceRecord(id, 180, 180));
+
+        mockMvc.perform(get("/work-attendances/{cpf}/{year}/{month}", VALID_CPF, year, month))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.employeeCpf", equalTo(record.getRecordId().getEmployeeCpf())))
+                .andExpect(jsonPath("$.year", equalTo(record.getRecordId().getYear())))
+                .andExpect(jsonPath("$.month", equalTo(record.getRecordId().getMonth())))
+                .andExpect(jsonPath("$.expectedWorkingHours", equalTo(record.getExpectedWorkingHours())))
+                .andExpect(jsonPath("$.actualWorkingHours", equalTo(record.getActualWorkingHours())));
+    }
+
+    @Test
+    @DisplayName("Should not find by employeeCpf, year and month and return not found")
+    void shouldNotFindByEmployeeCpfYearAndMonthAndReturnNotFound() throws Exception {
+        int year = 2024;
+        int month = 10;
+
+        mockMvc.perform(get("/work-attendances/{cpf}/{year}/{month}", VALID_CPF, year, month))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo(String.format("/work-attendances/%s/%d/%d", VALID_CPF, year, month))))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("WorkAttendanceRecord")));
+
     }
 }

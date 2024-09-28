@@ -1,6 +1,7 @@
 package com.gabrielluciano.workattendanceservice.application.resource;
 
 import com.gabrielluciano.workattendanceservice.domain.dto.CreateWorkAttendanceRequest;
+import com.gabrielluciano.workattendanceservice.domain.dto.WorkAttendanceResponse;
 import com.gabrielluciano.workattendanceservice.domain.service.WorkAttendanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,14 @@ public class WorkAttendanceResource {
         log.info("Successfully created work attendance for cpf '{}', month '{}' and year '{}'",
                 body.employeeCpf(), body.month(), body.year());
         return ResponseEntity.created(createLocation(body)).build();
+    }
+
+    @GetMapping("{cpf}/{year}/{month}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<WorkAttendanceResponse> findByCpfYearAndMonth(@PathVariable String cpf,
+                                                                        @PathVariable Integer year,
+                                                                        @PathVariable Integer month) {
+        return ResponseEntity.ok(service.findByCpfYearAndMonth(cpf, year, month));
     }
 
     private URI createLocation(CreateWorkAttendanceRequest body) {

@@ -1,6 +1,7 @@
 package com.gabrielluciano.workattendanceservice.application.resource.exception;
 
 import com.gabrielluciano.workattendanceservice.domain.exception.DuplicatedEntityException;
+import com.gabrielluciano.workattendanceservice.domain.exception.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +95,19 @@ public class ResourceExceptionHandler {
                     return error.getDefaultMessage();
                 })
                 .collect(Collectors.joining(", "));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<StandardError> handleEntityNotFoundException(EntityNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        var error = StandardError.builder()
+                .error("Entity Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .build();
+        log.info("Entity Not Found. Id: {}", ex.getId());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }
