@@ -25,6 +25,7 @@ public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
     private Long id;
+
     @Column(unique = true, nullable = false)
     @NotBlank
     private String name;

@@ -9,6 +9,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -49,9 +51,38 @@ public class ResourceExceptionHandler {
 
     private String createConstraintViolationsMessage(ConstraintViolationException ex) {
         return ex.getConstraintViolations().stream()
-                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .map(violation -> {
+                    if (violation.getPropertyPath().toString().isBlank())
+                        return violation.getMessage();
+                    return violation.getPropertyPath() + ": " + violation.getMessage();
+                })
                 .collect(Collectors.joining(", "));
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+                                                                               HttpServletRequest request) {
+        var error = StandardError.builder()
+                .error("Constraint Violation")
+                .message(createConstraintsViolationsMessage(ex))
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+        log.info("Method Argument Violation. Error details: {}", error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    private String createConstraintsViolationsMessage(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getAllErrors().stream()
+                .map(error -> {
+                    if (error instanceof FieldError fieldError)
+                        return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+                    return error.getDefaultMessage();
+                })
+                .collect(Collectors.joining(", "));
+    }
+
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<StandardError> handleEntityNotFoundException(EntityNotFoundException ex,

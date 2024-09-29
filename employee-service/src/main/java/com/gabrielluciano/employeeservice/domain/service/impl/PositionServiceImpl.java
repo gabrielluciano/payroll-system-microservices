@@ -4,6 +4,7 @@ import com.gabrielluciano.employeeservice.domain.dto.CreatePositionRequest;
 import com.gabrielluciano.employeeservice.domain.dto.PositionResponse;
 import com.gabrielluciano.employeeservice.domain.service.PositionService;
 import com.gabrielluciano.employeeservice.infra.repository.PositionRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     @Transactional
-    public PositionResponse save(CreatePositionRequest createPositionRequest) {
+    public PositionResponse save(@Valid CreatePositionRequest createPositionRequest) {
         return PositionResponse.fromModel(repository.save(createPositionRequest.toModel()));
     }
 }

@@ -10,11 +10,10 @@ import com.gabrielluciano.employeeservice.domain.model.Position;
 import com.gabrielluciano.employeeservice.domain.service.EmployeeService;
 import com.gabrielluciano.employeeservice.infra.repository.EmployeeRepository;
 import com.gabrielluciano.employeeservice.infra.repository.PositionRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +31,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional
-    public EmployeeResponse save(CreateEmployeeRequest createEmployeeRequest) {
-        Optional<Employee> employeeFromDb = employeeRepository.findByCpf(createEmployeeRequest.cpf());
+    public EmployeeResponse save(@Valid CreateEmployeeRequest createEmployeeRequest) {
+        var employeeFromDb = employeeRepository.findByCpf(createEmployeeRequest.cpf());
         if (employeeFromDb.isPresent())
             throw new DuplicatedEntityException(createEmployeeRequest.cpf(), Employee.class);
 
@@ -47,7 +46,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional
-    public EmployeeResponse update(String cpf, UpdateEmployeeRequest updateEmployeeRequest) {
+    public EmployeeResponse update(String cpf, @Valid UpdateEmployeeRequest updateEmployeeRequest) {
         Employee employee = employeeRepository.findByCpf(cpf)
                 .orElseThrow(() -> new EntityNotFoundException(cpf, Employee.class));
         Position position = positionRepository.findById(updateEmployeeRequest.positionId())

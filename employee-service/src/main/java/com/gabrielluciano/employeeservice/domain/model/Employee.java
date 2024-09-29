@@ -27,9 +27,11 @@ public class Employee {
     @NotBlank
     @CPF
     private String cpf;
+
     @Column(nullable = false)
     @NotBlank
     private String name;
+
     @Column(nullable = false, precision = 10, scale = 2)
     @NotNull
     @Positive
