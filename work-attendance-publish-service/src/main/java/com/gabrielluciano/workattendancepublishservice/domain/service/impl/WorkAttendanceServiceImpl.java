@@ -1,21 +1,35 @@
 package com.gabrielluciano.workattendancepublishservice.domain.service.impl;
 
 import com.gabrielluciano.workattendancepublishservice.domain.dto.CreateWorkAttendanceRequest;
+import com.gabrielluciano.workattendancepublishservice.domain.exception.InternalServerErrorException;
+import com.gabrielluciano.workattendancepublishservice.domain.model.WorkAttendanceRecord;
 import com.gabrielluciano.workattendancepublishservice.domain.service.WorkAttendanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WorkAttendanceServiceImpl implements WorkAttendanceService {
 
+    private final KafkaTemplate<String, WorkAttendanceRecord> kafkaTemplate;
+
     @Override
-    @Transactional
     public void save(@Valid CreateWorkAttendanceRequest createWorkAttendanceRequest) {
-        var record = createWorkAttendanceRequest.toModel();
-        // TODO: publish event to Kafka
-        System.out.println("publish event to Kafka");
+        final var record = createWorkAttendanceRequest.toModel();
+
+        try {
+            kafkaTemplate.sendDefault(record.getEmployeeCpf(), record).get();
+        } catch (ExecutionException ex) {
+            throw new InternalServerErrorException("Error publishing event to Kafka", ex);
+        } catch (InterruptedException ex) {
+            log.error("The thread was interrupted", ex);
+            Thread.currentThread().interrupt();
+        }
     }
 }
