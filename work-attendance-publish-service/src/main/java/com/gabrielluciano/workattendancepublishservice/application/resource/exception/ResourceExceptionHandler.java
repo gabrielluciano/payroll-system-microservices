@@ -1,6 +1,8 @@
 package com.gabrielluciano.workattendancepublishservice.application.resource.exception;
 
+import com.gabrielluciano.workattendancepublishservice.domain.exception.EntityNotFoundException;
 import com.gabrielluciano.workattendancepublishservice.domain.exception.InternalServerErrorException;
+import com.gabrielluciano.workattendancepublishservice.infra.exception.MicroserviceCommunicationErrorException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -78,5 +80,33 @@ public class ResourceExceptionHandler {
                 .build();
         log.error("Internal Server Error", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<StandardError> handleEntityNotFoundException(EntityNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        var error = StandardError.builder()
+                .error("Entity Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .build();
+        log.info("Entity Not Found. Id: {}", ex.getId());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(MicroserviceCommunicationErrorException.class)
+    public ResponseEntity<StandardError> handleMicroserviceCommunicationErrorException(MicroserviceCommunicationErrorException ex,
+                                                                                       HttpServletRequest request) {
+        var error = StandardError.builder()
+                .error("Service Communication Error")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .build();
+        log.error("Service communication error", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

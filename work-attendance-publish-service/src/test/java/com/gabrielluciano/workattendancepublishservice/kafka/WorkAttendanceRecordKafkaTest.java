@@ -2,6 +2,7 @@ package com.gabrielluciano.workattendancepublishservice.kafka;
 
 import com.gabrielluciano.workattendancepublishservice.domain.dto.CreateWorkAttendanceRequest;
 import com.gabrielluciano.workattendancepublishservice.domain.model.WorkAttendanceRecord;
+import com.gabrielluciano.workattendancepublishservice.domain.service.EmployeeService;
 import com.gabrielluciano.workattendancepublishservice.util.JsonUtils;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -10,9 +11,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,6 +44,9 @@ class WorkAttendanceRecordKafkaTest {
     public static final String TOPIC_NAME = "work-attendance-events";
     private static final String VALID_CPF = "127.361.540-96";
 
+    @MockBean
+    private EmployeeService employeeService;
+
     @Autowired
     private EmbeddedKafkaBroker embeddedKafka;
 
@@ -49,6 +56,9 @@ class WorkAttendanceRecordKafkaTest {
     @Test
     @DisplayName("Should publish work attendance record to kafka")
     void shouldPublishSaveWorkAttendanceRecordToKafka() throws Exception {
+        when(employeeService.existsByCpf(ArgumentMatchers.anyString()))
+                .thenReturn(true);
+
         var request = new CreateWorkAttendanceRequest(VALID_CPF, 2024, 10, 180, 180);
 
         mockMvc.perform(post("/work-attendances")

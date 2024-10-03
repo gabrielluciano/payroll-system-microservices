@@ -2,6 +2,8 @@ package com.gabrielluciano.workattendancepublishservice.application.resource;
 
 import com.gabrielluciano.workattendancepublishservice.domain.dto.CreateWorkAttendanceRequest;
 import com.gabrielluciano.workattendancepublishservice.domain.model.WorkAttendanceRecord;
+import com.gabrielluciano.workattendancepublishservice.domain.service.EmployeeService;
+import com.gabrielluciano.workattendancepublishservice.infra.exception.MicroserviceCommunicationErrorException;
 import com.gabrielluciano.workattendancepublishservice.util.JsonUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,11 +39,16 @@ class WorkAttendanceResourceTest {
     @MockBean
     private KafkaTemplate<String, WorkAttendanceRecord> kafkaTemplate;
 
+    @MockBean
+    private EmployeeService employeeService;
+
     @Test
     @DisplayName("Should publish work attendance record to kafka")
     void shouldPublishSaveWorkAttendanceRecordToKafka() throws Exception {
         when(kafkaTemplate.sendDefault(ArgumentMatchers.anyString(), ArgumentMatchers.any()))
                 .thenReturn(CompletableFuture.completedFuture(null));
+        when(employeeService.existsByCpf(ArgumentMatchers.anyString()))
+                .thenReturn(true);
 
         var request = new CreateWorkAttendanceRequest(VALID_CPF, 2024, 10, 180, 180);
 
@@ -52,6 +59,45 @@ class WorkAttendanceResourceTest {
                 .andExpect(status().isCreated());
 
         verify(kafkaTemplate, times(1)).sendDefault(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Should not publish record when cpf does not exist")
+    void shouldNotPublishRecordWhenCpfDoesNotExist() throws Exception {
+        var request = new CreateWorkAttendanceRequest(VALID_CPF, 2024, 10, 180, 180);
+        when(employeeService.existsByCpf(ArgumentMatchers.anyString()))
+                .thenReturn(false);
+
+        mockMvc.perform(post("/work-attendances")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.asJsonString(request)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.path", equalTo("/work-attendances")))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", equalTo("Entity Not Found")))
+                .andExpect(jsonPath("$.message", containsString("Employee")));
+
+        verify(kafkaTemplate, never()).sendDefault(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Should return 500 when error communicating with employee service")
+    void shouldWhenErrorCommunicatingWithEmployeeService() throws Exception {
+        var request = new CreateWorkAttendanceRequest(VALID_CPF, 2024, 10, 180, 180);
+        when(employeeService.existsByCpf(ArgumentMatchers.anyString()))
+                .thenThrow(MicroserviceCommunicationErrorException.class);
+
+        mockMvc.perform(post("/work-attendances")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.asJsonString(request)))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.path", equalTo("/work-attendances")))
+                .andExpect(jsonPath("$.status", equalTo(HttpStatus.INTERNAL_SERVER_ERROR.value())))
+                .andExpect(jsonPath("$.error", equalTo("Service Communication Error")));
+
+        verify(kafkaTemplate, never()).sendDefault(ArgumentMatchers.anyString(), ArgumentMatchers.any());
     }
 
     @Test
