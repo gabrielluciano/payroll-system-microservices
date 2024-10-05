@@ -42,6 +42,7 @@ public class KafkaConfig {
         props.put(ProducerConfig.CLIENT_ID_CONFIG, instanceId);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(JsonSerializer.TYPE_MAPPINGS, "work-attendance-record:" + WorkAttendanceRecord.class.getName());
         return new DefaultKafkaProducerFactory<>(props);
     }
 }
