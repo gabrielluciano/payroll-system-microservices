@@ -33,6 +33,7 @@ eureka:
 
 services:
   employeeServiceName: employee-service
+  incomeTaxServiceName: income-tax-service
 
 #logging:
 #  file:
