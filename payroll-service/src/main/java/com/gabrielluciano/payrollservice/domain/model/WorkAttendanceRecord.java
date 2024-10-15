@@ -10,6 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
+import static java.math.BigDecimal.valueOf;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,4 +42,11 @@ public class WorkAttendanceRecord {
     @NotNull
     @Min(0)
     private Integer actualWorkingHours;
+
+    public BigDecimal getPercentageOfHoursWorked() {
+        if (actualWorkingHours <= 0)
+            return BigDecimal.ZERO;
+
+        return valueOf(actualWorkingHours).divide(valueOf(expectedWorkingHours), new MathContext(5, RoundingMode.HALF_UP));
+    }
 }

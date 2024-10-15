@@ -1,10 +1,7 @@
 package com.gabrielluciano.payrollservice.domain.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -15,6 +12,7 @@ import java.math.BigDecimal;
 @SequenceGenerator(name = Payroll.SEQUENCE_NAME, sequenceName = Payroll.SEQUENCE_NAME)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payroll {
