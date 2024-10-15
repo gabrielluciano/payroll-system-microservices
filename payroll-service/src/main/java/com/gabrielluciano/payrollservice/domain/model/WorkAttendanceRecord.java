@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -43,6 +45,7 @@ public class WorkAttendanceRecord {
     @Min(0)
     private Integer actualWorkingHours;
 
+    @JsonIgnore
     public BigDecimal getPercentageOfHoursWorked() {
         if (actualWorkingHours <= 0)
             return BigDecimal.ZERO;
