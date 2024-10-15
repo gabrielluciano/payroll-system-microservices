@@ -16,9 +16,11 @@ import com.gabrielluciano.payrollservice.domain.service.PayrollService;
 import com.gabrielluciano.payrollservice.infra.repository.PayrollRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PayrollServiceImpl implements PayrollService {
 
     private final PayrollRepository repository;
@@ -29,7 +31,22 @@ public class PayrollServiceImpl implements PayrollService {
     @Override
     @Transactional
     public void processPayroll(WorkAttendanceRecord attendanceRecord) {
+        if (attendanceRecord == null) {
+            log.warn("null WorkAttendanceRecord detected. Skiping processing");
+            return;
+        }
+
+        final var optionalPayroll = repository.findPayroll(
+            attendanceRecord.getEmployeeCpf(), attendanceRecord.getYear(), attendanceRecord.getMonth());
+
+        if (optionalPayroll.isPresent()) {
+            log.warn("Payroll with for cpf '{}', year '{}' and month '{}' already exists. Skipping processing",
+                attendanceRecord.getEmployeeCpf(), attendanceRecord.getYear(), attendanceRecord.getMonth());
+            return;
+        }
+
         final Payroll payroll = createPayrollObj(attendanceRecord);
+
         repository.save(payroll);
     }
 
