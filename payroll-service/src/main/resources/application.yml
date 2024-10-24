@@ -39,6 +39,12 @@ services:
   incomeTaxServiceName: income-tax-service
   inssTaxServiceName: inss-tax-service
 
+springdoc:
+  swagger-ui:
+    path: /payrolls/swagger-ui.html
+  api-docs:
+    path: /payrolls/api-docs
+
 #logging:
 #  file:
 #    name: ./logs/${spring.application.name}-log.log

@@ -27,6 +27,12 @@ eureka:
 services:
   employeeServiceName: employee-service
 
+springdoc:
+  swagger-ui:
+    path: /work-attendances/swagger-ui.html
+  api-docs:
+    path: /work-attendances/api-docs
+
 #logging:
 #  file:
 #    name: ./logs/${spring.application.name}-log.log

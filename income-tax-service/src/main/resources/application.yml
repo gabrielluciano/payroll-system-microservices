@@ -26,6 +26,12 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
+springdoc:
+  swagger-ui:
+    path: /income/swagger-ui.html
+  api-docs:
+    path: /income/api-docs
+
 #logging:
 #  file:
 #    name: ./logs/${spring.application.name}-log.log
