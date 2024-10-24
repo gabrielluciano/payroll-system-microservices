@@ -20,6 +20,7 @@ public class ApiGatewayApplication {
 				.route(r -> r.path("/income/**").uri("lb://income-tax-service"))
 				.route(r -> r.path("/inss/**").uri("lb://inss-tax-service"))
 				.route(r -> r.path("/work-attendances/**").uri("lb://work-attendance-service"))
+				.route(r -> r.path("/payrolls/**").uri("lb://payroll-service"))
 				.build();
 	}
 

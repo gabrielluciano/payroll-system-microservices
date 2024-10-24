@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gabrielluciano.payrollservice.domain.dto.Employee;
+import com.gabrielluciano.payrollservice.domain.dto.PayrollResponse;
 import com.gabrielluciano.payrollservice.domain.model.Payroll;
 import com.gabrielluciano.payrollservice.domain.model.WorkAttendanceRecord;
 import com.gabrielluciano.payrollservice.domain.service.EmployeeService;
 import com.gabrielluciano.payrollservice.domain.service.IncomeService;
 import com.gabrielluciano.payrollservice.domain.service.InssService;
 import com.gabrielluciano.payrollservice.domain.service.PayrollService;
+import com.gabrielluciano.payrollservice.domain.service.exception.EntityNotFoundException;
 import com.gabrielluciano.payrollservice.infra.repository.PayrollRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -70,4 +72,13 @@ public class PayrollServiceImpl implements PayrollService {
             .netPay(netPay)
             .build();
     }
+
+    @Override
+    public PayrollResponse getPayroll(String cpf, Integer year, Integer month) {
+        return repository.findPayroll(cpf, year, month)
+                    .map(PayrollResponse::fromModel)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("%s,%d,%d", cpf, year, month), Payroll.class));
+    }
 }
+
