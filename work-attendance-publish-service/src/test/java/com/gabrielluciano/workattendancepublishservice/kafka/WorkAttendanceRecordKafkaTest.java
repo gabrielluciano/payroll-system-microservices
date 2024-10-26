@@ -87,6 +87,7 @@ class WorkAttendanceRecordKafkaTest {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        consumerProps.put(JsonDeserializer.TYPE_MAPPINGS, "work-attendance-record:" + WorkAttendanceRecord.class.getName());
         ConsumerFactory<String, WorkAttendanceRecord> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
         Consumer<String, WorkAttendanceRecord> consumer = cf.createConsumer();
 
