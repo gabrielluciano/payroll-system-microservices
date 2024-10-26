@@ -11,6 +11,14 @@ management:
       exposure:
         include: "health,info,metrics,env,caches,threaddump,logfile"
 
+security:
+  user:
+    username: admin
+    password: password
+  service:
+    username: microservice
+    password: password
+
 eureka:
   instance:
     hostname: localhost
@@ -18,4 +26,5 @@ eureka:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://${security.service.username}:${security.service.password}@${eureka.instance.hostname}:${server.port}/eureka/
+

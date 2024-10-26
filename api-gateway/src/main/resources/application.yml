@@ -17,12 +17,17 @@ management:
       exposure:
         include: "health,info,metrics,env,caches,threaddump,logfile"
 
+security:
+  service:
+    username: microservice
+    password: password
+
 eureka:
   instance:
     instanceId: ${service.instanceId}
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://${security.service.username}:${security.service.password}@localhost:8761/eureka/
 
 #logging:
 #  file:
