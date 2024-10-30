@@ -13,7 +13,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "tax_rate")
+@Table(name = "tax_rates")
 @SequenceGenerator(name = TaxRate.SEQUENCE_NAME, sequenceName = TaxRate.SEQUENCE_NAME)
 @Getter
 @Setter
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @ValidThresholds
 public class TaxRate implements Comparable<TaxRate> {
 
-    public static final String SEQUENCE_NAME = "sequence_tax_rate";
+    public static final String SEQUENCE_NAME = "sequence_tax_rates";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
