@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Position {
 
-    public static final String SEQUENCE_NAME = "positions_sequence";
+    public static final String SEQUENCE_NAME = "sequence_positions";
 
     public Position(String name) {
         this.name = name;

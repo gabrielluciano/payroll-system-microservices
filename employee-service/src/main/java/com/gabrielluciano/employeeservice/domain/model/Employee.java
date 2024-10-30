@@ -1,6 +1,14 @@
 package com.gabrielluciano.employeeservice.domain.model;
 
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+import org.hibernate.validator.constraints.br.CPF;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -8,20 +16,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.br.CPF;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "employees")
-@SequenceGenerator(name = Employee.SEQUENCE_NAME, sequenceName = Employee.SEQUENCE_NAME)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee {
-
-    public static final String SEQUENCE_NAME = "sequence_employee";
 
     @Id
     @NotBlank
