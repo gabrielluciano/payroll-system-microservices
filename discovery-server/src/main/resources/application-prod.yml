@@ -12,8 +12,8 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  username: microservice
-  password: password
+  username: ${EUREKA_SECURITY_USERNAME}
+  password: ${EUREKA_SECURITY_PASSWORD}
 
 eureka:
   instance:
@@ -24,3 +24,6 @@ eureka:
     serviceUrl:
       defaultZone: http://${security.username}:${security.password}@${eureka.instance.hostname}:${server.port}/eureka/
 
+logging:
+  file:
+    name: ./logs/${spring.application.name}-log.log

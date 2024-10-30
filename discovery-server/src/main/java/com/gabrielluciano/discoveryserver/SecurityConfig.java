@@ -18,7 +18,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrf -> csrf.ignoringRequestMatchers("/eureka/**"))
+        return http
+                .cors(cors -> cors.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/eureka/**"))
                 .authorizeHttpRequests(authz -> authz
                     .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
@@ -28,18 +30,13 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
-        @Value("${security.user.username}") String adminUsername,
-        @Value("${security.user.password}") String adminPassword,
-        @Value("${security.service.username}") String serviceUsername,
-        @Value("${security.service.password}") String servicePassword
+        @Value("${security.username}") String username,
+        @Value("${security.password}") String password
     ) {
-        UserDetails admin = User.withUsername(adminUsername)
-                .password(passwordEncoder().encode(adminPassword))
+        UserDetails user = User.withUsername(username)
+                .password(passwordEncoder().encode(password))
                 .build();
-        UserDetails service = User.withUsername(serviceUsername)
-                .password(passwordEncoder().encode(servicePassword))
-                .build();
-        return new InMemoryUserDetailsManager(admin, service);
+        return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
