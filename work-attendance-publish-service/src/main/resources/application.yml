@@ -9,6 +9,7 @@ server:
   port: 0 # random port
 
 kafka:
+  bootstrapServers: localhost:9092
   topicName: work-attendance-events
 
 management:
@@ -18,16 +19,15 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  service:
-    username: microservice
-    password: password
+  username: microservice
+  password: password
 
 eureka:
   instance:
     instanceId: ${service.instanceId}
   client:
     serviceUrl:
-      defaultZone: http://${security.service.username}:${security.service.password}@localhost:8761/eureka/
+      defaultZone: http://${security.username}:${security.password}@localhost:8761/eureka/
 
 services:
   employeeServiceName: employee-service

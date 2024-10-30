@@ -33,9 +33,9 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, WorkAttendanceRecord> producerFactory() {
+    public ProducerFactory<String, WorkAttendanceRecord> producerFactory(@Value("${kafka.bootstrapServers}") String bootstrapServers) {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.ACKS_CONFIG, "-1");
         props.put(ProducerConfig.LINGER_MS_CONFIG, 5);
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "zstd");
