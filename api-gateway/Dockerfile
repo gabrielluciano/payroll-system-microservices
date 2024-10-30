@@ -1,0 +1,28 @@
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+RUN mvn package -DskipTests
+
+FROM eclipse-temurin:21.0.5_11-jre
+
+ARG JAR_FILE=/app/target/*.jar
+
+WORKDIR /app
+
+COPY ./certs/server.crt ./certs/server.crt
+
+RUN keytool -importcert -noprompt -trustcacerts -alias keycloak-cert \
+    -file /app/certs/server.crt -keystore $JAVA_HOME/lib/security/cacerts \
+    -storepass changeit
+
+COPY --from=build ${JAR_FILE} app.jar
+
+CMD ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
+
