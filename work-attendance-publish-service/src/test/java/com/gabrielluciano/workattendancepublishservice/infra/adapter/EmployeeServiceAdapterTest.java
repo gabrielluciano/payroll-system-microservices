@@ -1,11 +1,11 @@
 package com.gabrielluciano.workattendancepublishservice.infra.adapter;
 
-import com.gabrielluciano.workattendancepublishservice.domain.dto.EmployeeResponse;
-import com.gabrielluciano.workattendancepublishservice.domain.dto.PositionResponse;
-import com.gabrielluciano.workattendancepublishservice.domain.service.EmployeeService;
-import com.gabrielluciano.workattendancepublishservice.infra.exception.MicroserviceCommunicationErrorException;
-import com.gabrielluciano.workattendancepublishservice.infra.httpclients.EmployeeServiceClient;
-import feign.FeignException;
+import static java.math.BigDecimal.valueOf;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static java.math.BigDecimal.valueOf;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import com.gabrielluciano.workattendancepublishservice.domain.service.EmployeeService;
+import com.gabrielluciano.workattendancepublishservice.infra.dto.EmployeeResponse;
+import com.gabrielluciano.workattendancepublishservice.infra.dto.PositionResponse;
+import com.gabrielluciano.workattendancepublishservice.infra.exception.MicroserviceCommunicationErrorException;
+import com.gabrielluciano.workattendancepublishservice.infra.httpclients.EmployeeServiceClient;
+
+import feign.FeignException;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceAdapterTest {

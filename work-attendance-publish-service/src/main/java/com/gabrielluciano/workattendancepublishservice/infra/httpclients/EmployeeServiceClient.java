@@ -1,10 +1,11 @@
 package com.gabrielluciano.workattendancepublishservice.infra.httpclients;
 
-import com.gabrielluciano.workattendancepublishservice.domain.dto.EmployeeResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import com.gabrielluciano.workattendancepublishservice.infra.dto.EmployeeResponse;
 
 @FeignClient(name = "${services.employeeServiceName}", path = "/employees")
 public interface EmployeeServiceClient {

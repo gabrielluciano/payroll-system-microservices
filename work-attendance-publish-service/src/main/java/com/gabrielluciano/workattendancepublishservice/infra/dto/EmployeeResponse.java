@@ -1,4 +1,4 @@
-package com.gabrielluciano.workattendancepublishservice.domain.dto;
+package com.gabrielluciano.workattendancepublishservice.infra.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
