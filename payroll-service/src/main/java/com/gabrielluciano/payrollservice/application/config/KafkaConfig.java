@@ -51,9 +51,9 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, WorkAttendanceRecord> producerFactory() {
+    public ProducerFactory<String, WorkAttendanceRecord> producerFactory(@Value("${kafka.bootstrapServers}") String bootstrapServers) {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.ACKS_CONFIG, "-1");
         props.put(ProducerConfig.LINGER_MS_CONFIG, 5);
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "zstd");
@@ -84,20 +84,16 @@ public class KafkaConfig {
     };
 
     @Bean
-    public ConsumerFactory<String, WorkAttendanceRecord> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerProps());
-    }
-
-    private Map<String, Object> consumerProps() {
+    public ConsumerFactory<String, WorkAttendanceRecord> consumerFactory(@Value("${kafka.bootstrapServers}") String bootstrapServers) {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, applicationName);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, workAttendancePublishServicePackage);
         props.put(JsonDeserializer.TYPE_MAPPINGS, "work-attendance-record:" + WorkAttendanceRecord.class.getName());
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        return props;
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 }
 
