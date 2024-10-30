@@ -26,11 +26,11 @@ public class SecurityConfig {
 
     @Bean
     public MapReactiveUserDetailsService userDetailsService(
-        @Value("${security.service.username}") String serviceUsername,
-        @Value("${security.service.password}") String servicePassword
+        @Value("${security.username}") String username,
+        @Value("${security.password}") String password 
     ) {
-        UserDetails service = User.withUsername(serviceUsername)
-                .password(passwordEncoder().encode(servicePassword))
+        UserDetails service = User.withUsername(username)
+                .password(passwordEncoder().encode(password))
                 .build();
         return new MapReactiveUserDetailsService(service);
     }
