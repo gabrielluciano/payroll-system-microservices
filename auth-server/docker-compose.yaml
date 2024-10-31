@@ -19,6 +19,7 @@ services:
       - KC_DB_URL=jdbc:postgresql://db:5432/${KEYCLOAK_DB}
       - KC_DB_USERNAME=${KEYCLOAK_DB_USERNAME}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+      - KC_HOSTNAME=localhost
     command: start-dev
     depends_on:
       - db

@@ -21,6 +21,7 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KEYCLOAK_DB}
       - KC_DB_USERNAME=${KEYCLOAK_DB_USERNAME}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+      - KC_HOSTNAME=${KC_HOSTNAME}
     command: start --optimized
     depends_on:
       - keycloak-db
