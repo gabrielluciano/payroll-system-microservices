@@ -1,4 +1,4 @@
-package com.gabrielluciano.payrollservice.domain.service.impl;
+package com.gabrielluciano.payrollservice.domain.calculation.impl;
 
 import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,17 +14,17 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.dto.InssTaxRate;
-import com.gabrielluciano.payrollservice.domain.service.InssService;
-import com.gabrielluciano.payrollservice.domain.service.InssTaxService;
+import com.gabrielluciano.payrollservice.domain.provider.InssTaxRateProvider;
 
 @ExtendWith(SpringExtension.class)
-class InssServiceImplTest {
+class InssDiscountCalculatorImplTest {
 
     @MockBean
-    private InssTaxService taxService;
+    private InssTaxRateProvider taxRateProvider;
 
-    private InssService inssServiceImpl;
+    private InssDiscountCalculator inssDiscountCalculatorImpl;
 
     private final List<InssTaxRate> taxRates = List.of(
         new InssTaxRate(1L, valueOf(0.00),    valueOf(1412.00), valueOf(0.075)),
@@ -35,8 +35,8 @@ class InssServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        when(taxService.getTaxRates()).thenReturn(taxRates);
-        inssServiceImpl = new InssServiceImpl(taxService);
+        when(taxRateProvider.getTaxRates()).thenReturn(taxRates);
+        inssDiscountCalculatorImpl = new InssDiscountCalculatorImpl(taxRateProvider);
     }
 
     @ParameterizedTest
@@ -61,7 +61,7 @@ class InssServiceImplTest {
         "7786.02, 908.86",
     })
     void testCalculateDiscount(String grossPay, String expectedTax) {
-        var tax = inssServiceImpl.calculateDiscount(new BigDecimal(grossPay));
+        var tax = inssDiscountCalculatorImpl.calculateDiscount(new BigDecimal(grossPay));
         assertThat(tax).isEqualByComparingTo(new BigDecimal(expectedTax));
     }
 }

@@ -3,7 +3,7 @@ package com.gabrielluciano.payrollservice.domain.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
@@ -14,13 +14,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
+import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.dto.Employee;
 import com.gabrielluciano.payrollservice.domain.dto.EmployeePosition;
 import com.gabrielluciano.payrollservice.domain.model.Payroll;
 import com.gabrielluciano.payrollservice.domain.model.WorkAttendanceRecord;
 import com.gabrielluciano.payrollservice.domain.service.EmployeeService;
-import com.gabrielluciano.payrollservice.domain.service.IncomeService;
-import com.gabrielluciano.payrollservice.domain.service.InssService;
 import com.gabrielluciano.payrollservice.infra.repository.PayrollRepository;
 
 @ExtendWith(SpringExtension.class)
@@ -31,15 +31,16 @@ class PayrollServiceImplTest {
     @MockBean
     private EmployeeService employeeService;
     @MockBean
-    private InssService inssService;
+    private InssDiscountCalculator inssDiscountCalculator;
     @MockBean
-    private IncomeService incomeService;
+    private IncomeDiscountCalculator incomeDiscountCalculator;
 
     private PayrollServiceImpl payrollServiceImpl;
 
     @BeforeEach
     void setUp() {
-        payrollServiceImpl = new PayrollServiceImpl(payrollRepository, employeeService, inssService, incomeService);
+        payrollServiceImpl = new PayrollServiceImpl(payrollRepository, 
+            employeeService, inssDiscountCalculator, incomeDiscountCalculator);
     }
 
     @ParameterizedTest
@@ -60,8 +61,8 @@ class PayrollServiceImplTest {
         final String VALID_CPF = "127.361.540-96";
         Employee employee = new Employee("Test", VALID_CPF, new BigDecimal(salary), new EmployeePosition(1L, "Developer"));
         when(employeeService.findByCpf(anyString())).thenReturn(employee);
-        when(incomeService.calculateDiscount(any())).thenReturn(new BigDecimal(inssDiscount));
-        when(inssService.calculateDiscount(any())).thenReturn(new BigDecimal(incomeDiscount));
+        when(incomeDiscountCalculator.calculateDiscount(any())).thenReturn(new BigDecimal(inssDiscount));
+        when(inssDiscountCalculator.calculateDiscount(any())).thenReturn(new BigDecimal(incomeDiscount));
 
         var attendanceRecord = new WorkAttendanceRecord(VALID_CPF, 2020, 1, expectedWorkingHours, actualWorkingHours);
 

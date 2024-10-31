@@ -17,45 +17,45 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.gabrielluciano.payrollservice.domain.dto.InssTaxRate;
-import com.gabrielluciano.payrollservice.domain.service.InssTaxService;
+import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
+import com.gabrielluciano.payrollservice.domain.provider.IncomeTaxRateProvider;
 import com.gabrielluciano.payrollservice.infra.exception.MicroserviceCommunicationErrorException;
-import com.gabrielluciano.payrollservice.infra.httpclients.InssTaxServiceClient;
+import com.gabrielluciano.payrollservice.infra.httpclients.IncomeTaxServiceClient;
 
 import feign.FeignException;
 
 @ExtendWith(MockitoExtension.class)
-class InssTaxServiceAdapterTest {
+class IncomeTaxRateProviderAdapterTest {
 
-    private final List<InssTaxRate> taxRates = List.of(
-        new InssTaxRate(1L, valueOf(0.00),    valueOf(1412.00), valueOf(0.075)),
-        new InssTaxRate(2L, valueOf(1412.01), valueOf(2666.68), valueOf(0.09)),
-        new InssTaxRate(3L, valueOf(2666.69), valueOf(4000.03), valueOf(0.12)),
-        new InssTaxRate(4L, valueOf(4000.04), valueOf(7786.02), valueOf(0.14))
+    private final List<IncomeTaxRate> taxRates = List.of(
+        new IncomeTaxRate(null, valueOf(0.00),    valueOf(2112.00), valueOf(0.00), valueOf(0.00)),
+        new IncomeTaxRate(null, valueOf(2112.01), valueOf(2826.65), valueOf(0.075), valueOf(158.40)),
+        new IncomeTaxRate(null, valueOf(2826.66), valueOf(3751.05), valueOf(0.15), valueOf(370.40)),
+        new IncomeTaxRate(null, valueOf(3751.06), valueOf(4664.68), valueOf(0.225), valueOf(651.73)),
+        new IncomeTaxRate(null, valueOf(4664.69), valueOf(10000000.00), valueOf(0.275), valueOf(884.96))
     );
 
     @Mock
-    private InssTaxServiceClient client;
+    private IncomeTaxServiceClient client;
 
-    private InssTaxService inssTaxServiceAdapter;
+    private IncomeTaxRateProvider incomeTaxRateProviderAdapter;
 
     @BeforeEach
     void setUp() {
-        inssTaxServiceAdapter = new InssTaxServiceAdapter(client);
+        incomeTaxRateProviderAdapter = new IncomeTaxRateProviderAdapter(client);
     }
 
     @Test
-    @DisplayName("getTaxRates return list of InssTaxRate when valid response")
-    void getTaxRates_ShouldReturnListOfInssTaxRateWhenValidResponse() {
+    @DisplayName("getTaxRates return list of IncomeTaxRate when valid response")
+    void getTaxRates_ShouldReturnListOfIncomeTaxRateWhenValidResponse() {
         var response = ResponseEntity.ok(taxRates);
 
         when(client.getTaxRates()).thenReturn(response);
 
-        List<InssTaxRate> returnedRates = inssTaxServiceAdapter.getTaxRates();
+        List<IncomeTaxRate> returnedRates = incomeTaxRateProviderAdapter.getTaxRates();
 
         assertThat(returnedRates).hasSize(taxRates.size());
         assertThat(returnedRates.get(0).rate()).isEqualByComparingTo(taxRates.get(0).rate());
-        assertThat(returnedRates.get(1).rate()).isEqualByComparingTo(taxRates.get(1).rate());
     }
 
     @Test
@@ -63,18 +63,18 @@ class InssTaxServiceAdapterTest {
     void getTaxRates_ShouldThrowMicroserviceCommunicationErrorExceptionWhenReturnDifferentFrom2xx() {
         when(client.getTaxRates()).thenReturn(getErrorResponse(HttpStatus.NOT_FOUND));
         Assertions.assertThatExceptionOfType(MicroserviceCommunicationErrorException.class)
-            .isThrownBy(() -> inssTaxServiceAdapter.getTaxRates());
+            .isThrownBy(() -> incomeTaxRateProviderAdapter.getTaxRates());
 
         when(client.getTaxRates()).thenReturn(getErrorResponse(HttpStatus.BAD_REQUEST));
         Assertions.assertThatExceptionOfType(MicroserviceCommunicationErrorException.class)
-            .isThrownBy(() -> inssTaxServiceAdapter.getTaxRates());
+            .isThrownBy(() -> incomeTaxRateProviderAdapter.getTaxRates());
 
         when(client.getTaxRates()).thenReturn(getErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR));
         Assertions.assertThatExceptionOfType(MicroserviceCommunicationErrorException.class)
-            .isThrownBy(() -> inssTaxServiceAdapter.getTaxRates());
+            .isThrownBy(() -> incomeTaxRateProviderAdapter.getTaxRates());
     }
 
-    private ResponseEntity<List<InssTaxRate>> getErrorResponse(HttpStatus status) {
+    private ResponseEntity<List<IncomeTaxRate>> getErrorResponse(HttpStatus status) {
         return ResponseEntity.status(status.value()).build();
     }
 
@@ -84,6 +84,6 @@ class InssTaxServiceAdapterTest {
         when(client.getTaxRates()).thenThrow(FeignException.FeignClientException.class);
 
         assertThatExceptionOfType(MicroserviceCommunicationErrorException.class)
-            .isThrownBy(() -> inssTaxServiceAdapter.getTaxRates());
+            .isThrownBy(() -> incomeTaxRateProviderAdapter.getTaxRates());
     }
 }

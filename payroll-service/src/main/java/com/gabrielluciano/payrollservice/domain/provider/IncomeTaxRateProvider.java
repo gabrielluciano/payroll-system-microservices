@@ -1,10 +1,10 @@
-package com.gabrielluciano.payrollservice.domain.service;
+package com.gabrielluciano.payrollservice.domain.provider;
 
 import java.util.List;
 
 import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
 
-public interface IncomeTaxService {
+public interface IncomeTaxRateProvider {
 
     List<IncomeTaxRate> getTaxRates();
 }

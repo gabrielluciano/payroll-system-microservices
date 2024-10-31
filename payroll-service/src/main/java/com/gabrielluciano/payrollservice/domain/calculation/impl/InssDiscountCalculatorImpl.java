@@ -1,4 +1,4 @@
-package com.gabrielluciano.payrollservice.domain.service.impl;
+package com.gabrielluciano.payrollservice.domain.calculation.impl;
 
 import static java.math.BigDecimal.valueOf;
 
@@ -8,24 +8,24 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.dto.InssTaxRate;
-import com.gabrielluciano.payrollservice.domain.service.InssService;
-import com.gabrielluciano.payrollservice.domain.service.InssTaxService;
+import com.gabrielluciano.payrollservice.domain.provider.InssTaxRateProvider;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class InssServiceImpl implements InssService {
+public class InssDiscountCalculatorImpl implements InssDiscountCalculator {
 
-    private final InssTaxService taxService;
+    private final InssTaxRateProvider taxRateProvider;
 
     @Override
     public BigDecimal calculateDiscount(BigDecimal grossPay) {
         if (grossPay == null)
             return valueOf(0.00).setScale(2, RoundingMode.HALF_UP);
 
-        final var taxRates = taxService.getTaxRates().stream().sorted().toList();
+        final var taxRates = taxRateProvider.getTaxRates().stream().sorted().toList();
 
         return calculateTax(grossPay, taxRates).setScale(2, RoundingMode.HALF_UP);
     }

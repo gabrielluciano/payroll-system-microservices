@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
-import com.gabrielluciano.payrollservice.domain.service.IncomeTaxService;
+import com.gabrielluciano.payrollservice.domain.provider.IncomeTaxRateProvider;
 import com.gabrielluciano.payrollservice.infra.exception.MicroserviceCommunicationErrorException;
 import com.gabrielluciano.payrollservice.infra.httpclients.IncomeTaxServiceClient;
 
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class IncomeTaxServiceAdapter implements IncomeTaxService {
+public class IncomeTaxRateProviderAdapter implements IncomeTaxRateProvider {
 
     private final IncomeTaxServiceClient client;
 

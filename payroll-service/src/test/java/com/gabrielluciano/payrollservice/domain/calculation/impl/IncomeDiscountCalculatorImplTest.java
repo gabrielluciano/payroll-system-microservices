@@ -1,4 +1,4 @@
-package com.gabrielluciano.payrollservice.domain.service.impl;
+package com.gabrielluciano.payrollservice.domain.calculation.impl;
 
 import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,17 +14,17 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
-import com.gabrielluciano.payrollservice.domain.service.IncomeService;
-import com.gabrielluciano.payrollservice.domain.service.IncomeTaxService;
+import com.gabrielluciano.payrollservice.domain.provider.IncomeTaxRateProvider;
 
 @ExtendWith(SpringExtension.class)
-class IncomeServiceImplTest {
+class IncomeDiscountCalculatorImplTest {
 
     @MockBean
-    private IncomeTaxService taxService;
+    private IncomeTaxRateProvider taxRateProvider;
 
-    private IncomeService incomeServiceImpl;
+    private IncomeDiscountCalculator incomeDiscountCalculatorImpl;
 
     private final List<IncomeTaxRate> taxRates = List.of(
         new IncomeTaxRate(null, valueOf(0.00),    valueOf(2112.00), valueOf(0.00), valueOf(0.00)),
@@ -36,8 +36,8 @@ class IncomeServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        when(taxService.getTaxRates()).thenReturn(taxRates);
-        incomeServiceImpl = new IncomeServiceImpl(taxService);
+        when(taxRateProvider.getTaxRates()).thenReturn(taxRates);
+        incomeDiscountCalculatorImpl = new IncomeDiscountCalculatorImpl(taxRateProvider);
     }
 
     @ParameterizedTest
@@ -63,7 +63,7 @@ class IncomeServiceImplTest {
         "4664.68, 397.82",
     })
     void testCalculateDiscount(String grossPay, String expectedTax) {
-        var tax = incomeServiceImpl.calculateDiscount(new BigDecimal(grossPay));
+        var tax = incomeDiscountCalculatorImpl.calculateDiscount(new BigDecimal(grossPay));
         assertThat(tax).isEqualByComparingTo(new BigDecimal(expectedTax));
     }
 }

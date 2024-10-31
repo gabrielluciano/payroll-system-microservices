@@ -16,12 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.gabrielluciano.payrollservice.application.config.KafkaConfig;
 import com.gabrielluciano.payrollservice.domain.model.WorkAttendanceRecord;
 import com.gabrielluciano.payrollservice.domain.service.PayrollService;
 
 @ImportAutoConfiguration(KafkaAutoConfiguration.class)
+@DirtiesContext
 @SpringBootTest(classes = { WorkAttendanceRecordListener.class, PayrollService.class, KafkaConfig.class })
 @EmbeddedKafka(partitions = 1, topics = {"${kafka.topicName}"},
         brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
