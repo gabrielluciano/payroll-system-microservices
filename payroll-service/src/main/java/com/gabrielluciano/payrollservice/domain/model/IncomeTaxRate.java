@@ -1,16 +1,17 @@
-package com.gabrielluciano.payrollservice.domain.dto;
+package com.gabrielluciano.payrollservice.domain.model;
 
 import java.math.BigDecimal;
 
-public record InssTaxRate(
+public record IncomeTaxRate(
     Long id,
     BigDecimal minimumSalaryThreshold,
     BigDecimal maximumSalaryThreshold,
-    BigDecimal rate
-) implements Comparable<InssTaxRate> {
+    BigDecimal rate,
+    BigDecimal deduction
+) implements Comparable<IncomeTaxRate> {
 
     @Override
-    public int compareTo(InssTaxRate o) {
+    public int compareTo(IncomeTaxRate o) {
         return minimumSalaryThreshold.compareTo(o.minimumSalaryThreshold);
     }
 }

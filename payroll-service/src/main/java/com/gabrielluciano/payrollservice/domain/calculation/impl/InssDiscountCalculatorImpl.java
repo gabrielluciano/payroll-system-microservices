@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
-import com.gabrielluciano.payrollservice.domain.dto.InssTaxRate;
+import com.gabrielluciano.payrollservice.domain.model.InssTaxRate;
 import com.gabrielluciano.payrollservice.domain.provider.InssTaxRateProvider;
 
 import lombok.RequiredArgsConstructor;

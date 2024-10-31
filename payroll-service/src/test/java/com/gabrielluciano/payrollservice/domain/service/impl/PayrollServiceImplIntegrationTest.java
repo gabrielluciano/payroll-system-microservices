@@ -20,8 +20,8 @@ import com.gabrielluciano.payrollservice.application.kafka.WorkAttendanceRecordL
 import com.gabrielluciano.payrollservice.config.TestcontainersConfiguration;
 import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
-import com.gabrielluciano.payrollservice.domain.dto.Employee;
 import com.gabrielluciano.payrollservice.domain.dto.EmployeePosition;
+import com.gabrielluciano.payrollservice.domain.dto.EmployeeResponse;
 import com.gabrielluciano.payrollservice.domain.model.Payroll;
 import com.gabrielluciano.payrollservice.domain.model.WorkAttendanceRecord;
 import com.gabrielluciano.payrollservice.domain.service.EmployeeService;
@@ -58,7 +58,7 @@ class PayrollServiceImplIntegrationTest {
     void setUp() {
         payrollRepository.deleteAll();
 
-        Employee employee = new Employee("Test", VALID_CPF, valueOf(3500.00), new EmployeePosition(1L, "Developer"));
+        EmployeeResponse employee = new EmployeeResponse("Test", VALID_CPF, valueOf(3500.00), new EmployeePosition(1L, "Developer"));
         when(employeeService.findByCpf(anyString())).thenReturn(employee);
         when(incomeDiscountCalculator.calculateDiscount(any())).thenReturn(valueOf(100.00));
         when(inssDiscountCalculator.calculateDiscount(any())).thenReturn(valueOf(200.00));

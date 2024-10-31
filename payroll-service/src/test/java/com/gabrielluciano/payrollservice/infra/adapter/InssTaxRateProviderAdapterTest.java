@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.gabrielluciano.payrollservice.domain.dto.InssTaxRate;
+import com.gabrielluciano.payrollservice.domain.model.InssTaxRate;
 import com.gabrielluciano.payrollservice.domain.provider.InssTaxRateProvider;
 import com.gabrielluciano.payrollservice.infra.exception.MicroserviceCommunicationErrorException;
 import com.gabrielluciano.payrollservice.infra.httpclients.InssTaxServiceClient;

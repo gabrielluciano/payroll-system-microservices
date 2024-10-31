@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
-import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
+import com.gabrielluciano.payrollservice.domain.model.IncomeTaxRate;
 import com.gabrielluciano.payrollservice.domain.provider.IncomeTaxRateProvider;
 
 import lombok.RequiredArgsConstructor;

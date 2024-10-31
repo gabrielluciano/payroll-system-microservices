@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
 import com.gabrielluciano.payrollservice.domain.calculation.InssDiscountCalculator;
-import com.gabrielluciano.payrollservice.domain.dto.Employee;
+import com.gabrielluciano.payrollservice.domain.dto.EmployeeResponse;
 import com.gabrielluciano.payrollservice.domain.dto.PayrollResponse;
 import com.gabrielluciano.payrollservice.domain.model.Payroll;
 import com.gabrielluciano.payrollservice.domain.model.WorkAttendanceRecord;
@@ -53,7 +53,7 @@ public class PayrollServiceImpl implements PayrollService {
     }
 
     protected Payroll createPayrollObj(WorkAttendanceRecord attendanceRecord) {
-        final Employee employee = employeeService.findByCpf(attendanceRecord.getEmployeeCpf());
+        final EmployeeResponse employee = employeeService.findByCpf(attendanceRecord.getEmployeeCpf());
         final BigDecimal grossPay = employee.baseSalary().multiply(attendanceRecord.getPercentageOfHoursWorked());
 
         final BigDecimal inssDiscount = inssDiscountCalculator.calculateDiscount(grossPay);

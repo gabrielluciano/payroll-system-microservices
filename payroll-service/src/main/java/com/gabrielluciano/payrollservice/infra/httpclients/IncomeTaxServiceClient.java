@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
+import com.gabrielluciano.payrollservice.domain.model.IncomeTaxRate;
 
 @FeignClient(name = "${services.incomeTaxServiceName}", path = "/income")
 public interface IncomeTaxServiceClient {

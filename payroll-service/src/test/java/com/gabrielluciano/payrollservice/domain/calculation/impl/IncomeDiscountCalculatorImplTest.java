@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.gabrielluciano.payrollservice.domain.calculation.IncomeDiscountCalculator;
-import com.gabrielluciano.payrollservice.domain.dto.IncomeTaxRate;
+import com.gabrielluciano.payrollservice.domain.model.IncomeTaxRate;
 import com.gabrielluciano.payrollservice.domain.provider.IncomeTaxRateProvider;
 
 @ExtendWith(SpringExtension.class)

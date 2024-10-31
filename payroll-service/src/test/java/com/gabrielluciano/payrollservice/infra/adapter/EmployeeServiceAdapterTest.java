@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.gabrielluciano.payrollservice.domain.dto.Employee;
 import com.gabrielluciano.payrollservice.domain.dto.EmployeePosition;
+import com.gabrielluciano.payrollservice.domain.dto.EmployeeResponse;
 import com.gabrielluciano.payrollservice.domain.service.EmployeeService;
 import com.gabrielluciano.payrollservice.domain.service.exception.EntityNotFoundException;
 import com.gabrielluciano.payrollservice.infra.exception.MicroserviceCommunicationErrorException;
@@ -43,12 +43,12 @@ class EmployeeServiceAdapterTest {
     @Test
     @DisplayName("findByCpf should return Employee when valid response")
     void findByCpf_ShouldReturnEmployeeWhenValidResponse() {
-        Employee expected = new Employee("Tester", VALID_CPF, valueOf(1000.00), new EmployeePosition(1L, "Software Dev"));
+        EmployeeResponse expected = new EmployeeResponse("Tester", VALID_CPF, valueOf(1000.00), new EmployeePosition(1L, "Software Dev"));
         var response = ResponseEntity.ok(expected);
 
         when(client.findByCpf(anyString())).thenReturn(response);
 
-        Employee employee = employeeServiceAdapter.findByCpf(VALID_CPF);
+        EmployeeResponse employee = employeeServiceAdapter.findByCpf(VALID_CPF);
 
         assertThat(employee.name()).isEqualTo(expected.name());
         assertThat(employee.cpf()).isEqualTo(expected.cpf());
@@ -58,7 +58,7 @@ class EmployeeServiceAdapterTest {
     @Test
     @DisplayName("findByCpf should throw EntityNotFoundException when employee not found")
     void findByCpf_ShouldThrowEntityNotFoundExceptionWhenEmployeeNotFound() {
-        when(client.findByCpf(anyString())).thenThrow(new EntityNotFoundException(VALID_CPF, Employee.class));
+        when(client.findByCpf(anyString())).thenThrow(new EntityNotFoundException(VALID_CPF, EmployeeResponse.class));
 
         Assertions.assertThatExceptionOfType(EntityNotFoundException.class)
             .isThrownBy(() -> employeeServiceAdapter.findByCpf(VALID_CPF));
@@ -80,7 +80,7 @@ class EmployeeServiceAdapterTest {
             .isThrownBy(() -> employeeServiceAdapter.findByCpf(VALID_CPF));
     }
 
-    private ResponseEntity<Employee> getErrorResponse(HttpStatus status) {
+    private ResponseEntity<EmployeeResponse> getErrorResponse(HttpStatus status) {
         return ResponseEntity.status(status.value()).build();
     }
 
