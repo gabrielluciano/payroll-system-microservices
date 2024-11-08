@@ -10,7 +10,7 @@ spring:
       ddl-auto: none
 
 server:
-  port: 0 # random port
+  port: 0
 
 management:
   endpoints:

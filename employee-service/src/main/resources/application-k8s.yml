@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: employee-service
+  datasource:
+    url: ${DATABASE_URL}/${DATABASE_NAME}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: ${SERVER_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
+
+eureka:
+  client:
+    enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /employees/swagger-ui.html
+  api-docs:
+    path: /employees/api-docs
+
+logging:
+  file:
+    name: ./logs/${spring.application.name}-log.log
