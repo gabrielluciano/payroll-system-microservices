@@ -27,8 +27,8 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  username: ${METRICS_SECURITY_USERNAME}
-  password: ${METRICS_SECURITY_PASSWORD}
+  username: ${EUREKA_SECURITY_USERNAME}
+  password: ${EUREKA_SECURITY_PASSWORD}
 
 services:
   employeeService:
