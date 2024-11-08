@@ -14,6 +14,9 @@ spring:
           issuer-uri: ${AUTHZ_SERVER_ISSUER_URI}
           jwk-set-uri: ${AUTHZ_SERVER_JWK_SET_URI}
 
+server:
+  port: 8080
+
 service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
@@ -24,8 +27,25 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  username: ${EUREKA_SECURITY_USERNAME}
-  password: ${EUREKA_SECURITY_PASSWORD}
+  username: ${METRICS_SECURITY_USERNAME}
+  password: ${METRICS_SECURITY_PASSWORD}
+
+services:
+  employeeService:
+    name: employee-service
+    url: lb://employee-service
+  incomeTaxService:
+    name: income-tax-service
+    url: lb://income-tax-service
+  inssTaxService:
+    name: inss-tax-service
+    url: lb://inss-tax-service
+  workAttendanceService:
+    name: work-attendance-service
+    url: lb://work-attendance-service
+  payrollService:
+    name: payroll-service
+    url: lb://payroll-service
 
 eureka:
   instance:

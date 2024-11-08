@@ -1,20 +1,15 @@
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-          lowerCaseServiceId: true
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8000/realms/payroll-system
+          issuer-uri: ${AUTHZ_SERVER_ISSUER_URI}
+          jwk-set-uri: ${AUTHZ_SERVER_JWK_SET_URI}
 
 server:
-  port: 8080
+  port: ${SERVER_PORT}
 
 service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
@@ -26,33 +21,30 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  username: username
-  password: password
+  username: ${METRICS_SECURITY_USERNAME}
+  password: ${METRICS_SECURITY_PASSWORD}
 
 services:
   employeeService:
     name: employee-service
-    url: lb://employee-service
+    url: ${EMPLOYEE_SERVICE_URL}
   incomeTaxService:
     name: income-tax-service
-    url: lb://income-tax-service
+    url: ${INCOME_TAX_SERVICE_URL}
   inssTaxService:
     name: inss-tax-service
-    url: lb://inss-tax-service
+    url: ${INSS_TAX_SERVICE_URL}
   workAttendanceService:
     name: work-attendance-service
-    url: lb://work-attendance-service
+    url: ${WORK_ATTENDANCE_SERVICE_URL}
   payrollService:
     name: payroll-service
-    url: lb://payroll-service
+    url: ${PAYROLL_SERVICE_URL}
 
 eureka:
-  instance:
-    instanceId: ${service.instanceId}
   client:
-    serviceUrl:
-      defaultZone: http://${security.username}:${security.password}@localhost:8761/eureka/
+    enabled: false
 
-#logging:
-#  file:
-#    name: ./logs/${spring.application.name}-log.log
+logging:
+  file:
+    name: ./logs/${spring.application.name}-log.log

@@ -7,6 +7,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.CorsSpec;
+import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,8 +46,8 @@ public class SecurityConfig {
                 .anyExchange().authenticated()
             )
             .httpBasic(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable());
+            .csrf(CsrfSpec::disable)
+            .cors(CorsSpec::disable);
         return http.build();
     }
 

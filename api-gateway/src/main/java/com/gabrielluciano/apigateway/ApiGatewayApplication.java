@@ -1,5 +1,6 @@
 package com.gabrielluciano.apigateway;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -14,14 +15,21 @@ public class ApiGatewayApplication {
     }
 
     @Bean
-    RouteLocator routes(RouteLocatorBuilder builder) {
+    RouteLocator routes(
+        RouteLocatorBuilder builder,
+        @Value("${services.employeeService.url}") String employeeServiceUrl,
+        @Value("${services.incomeTaxService.url}") String incomeTaxServiceUrl,
+        @Value("${services.inssTaxService.url}") String inssTaxServiceUrl,
+        @Value("${services.workAttendanceService.url}") String workAttendanceServiceUrl,
+        @Value("${services.payrollService.url}") String payrollServiceUrl
+    ) {
         return builder.routes()
-                .route(r -> r.path("/positions/**", "/employees/**").uri("lb://employee-service"))
-                .route(r -> r.path("/income/**").uri("lb://income-tax-service"))
-                .route(r -> r.path("/inss/**").uri("lb://inss-tax-service"))
-                .route(r -> r.path("/work-attendances/**").uri("lb://work-attendance-service"))
-                .route(r -> r.path("/payrolls/**").uri("lb://payroll-service"))
+                .route(r -> r.path("/positions/**", "/employees/**").uri(employeeServiceUrl))
+                .route(r -> r.path("/income/**").uri(incomeTaxServiceUrl))
+                .route(r -> r.path("/inss/**").uri(inssTaxServiceUrl))
+                .route(r -> r.path("/work-attendances/**").uri(workAttendanceServiceUrl))
+                .route(r -> r.path("/payrolls/**").uri(payrollServiceUrl))
                 .build();
     }
-
 }
+
