@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'discovery-server'
+    basic_auth:
+      username: 'microservice'
+      password: 'password'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['172.17.0.1:8761']
+
+  - job_name: 'eureka'
+    eureka_sd_configs:
+      - server: http://172.17.0.1:8761/eureka
+        basic_auth:
+          username: 'microservice'
+          password: 'password'
+        refresh_interval: 15s
+    basic_auth:
+      username: 'microservice'
+      password: 'password'
+    metrics_path: '/actuator/prometheus'
+    relabel_configs:
+      - source_labels: ['__meta_eureka_app_name']
+        target_label: 'job'
+
