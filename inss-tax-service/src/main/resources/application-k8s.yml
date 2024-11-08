@@ -13,7 +13,7 @@ service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 server:
-  port: 0 # random port
+  port: ${SERVER_PORT}
 
 management:
   endpoints:
@@ -21,16 +21,9 @@ management:
       exposure:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
-security:
-  username: ${EUREKA_SECURITY_USERNAME}
-  password: ${EUREKA_SECURITY_PASSWORD}
-
 eureka:
-  instance:
-    instanceId: ${service.instanceId}
   client:
-    serviceUrl:
-      defaultZone: http://${security.username}:${security.password}@${EUREKA_SERVER_HOST}:8761/eureka/
+    enabled: false
 
 springdoc:
   swagger-ui:
