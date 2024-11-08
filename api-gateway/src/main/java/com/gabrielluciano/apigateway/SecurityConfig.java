@@ -56,6 +56,11 @@ public class SecurityConfig {
     public SecurityWebFilterChain oAuth2SecurityWebFilterChain(ServerHttpSecurity http) {
         http
             .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/employees/swagger-ui/**", "/employees/api-docs/**").permitAll()
+                .pathMatchers("/inss/swagger-ui/**", "/inss/api-docs/**").permitAll()
+                .pathMatchers("/income/swagger-ui/**", "/income/api-docs/**").permitAll()
+                .pathMatchers("/work-attendances/swagger-ui/**", "/work-attendances/api-docs/**").permitAll()
+                .pathMatchers("/payrolls/swagger-ui/**", "/payrolls/api-docs/**").permitAll()
                 .anyExchange().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
