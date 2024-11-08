@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payroll-service-db
+  labels:
+    app: payroll-service-db
+spec:
+  ports:
+    - port: 5432
+  clusterIP: None
+  selector:
+    app: payroll-service-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: payroll-service-db
+spec:
+  selector:
+    matchLabels:
+      app: payroll-service-db
+  serviceName: "payroll-service-db"
+  replicas: 1
+  minReadySeconds: 15
+  template:
+    metadata:
+      labels:
+        app: payroll-service-db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: payroll-service-db
+          image: postgres:17.0
+          env:
+            - name: POSTGRES_DB
+              value: "payroll_service_db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: payroll-service-db
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payroll-service-db
+                  key: password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: "/var/lib/postgresql/data"
+            - name: ddl
+              mountPath: "/docker-entrypoint-initdb.d"
+      volumes:
+        - name: ddl
+          configMap:
+            name: payroll-service-db-configmap
+            items:
+              - key: "ddl.sql"
+                path: "ddl.sql"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOncePod" ]
+        storageClassName: ""
+        selector:
+          matchLabels:
+            app: payroll-service-db-pv
+        resources:
+          requests:
+            storage: 2Gi

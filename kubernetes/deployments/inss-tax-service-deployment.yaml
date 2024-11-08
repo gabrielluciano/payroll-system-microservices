@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inss-tax-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inss-tax-service
+  template:
+    metadata:
+      labels:
+        app: inss-tax-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: inss-tax-service
+          image: localhost:32000/ps-k8s-inss-tax-service:1.0
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://inss-tax-service-db:5432"
+            - name: DATABASE_NAME
+              value: "inss_tax_service_db"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: inss-tax-service-db
+                  key: user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inss-tax-service-db
+                  key: password
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always

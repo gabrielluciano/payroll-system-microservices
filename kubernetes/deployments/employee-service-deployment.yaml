@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: employee-service
+  template:
+    metadata:
+      labels:
+        app: employee-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: employee-service
+          image: localhost:32000/ps-k8s-employee-service:1.0
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://employee-service-db:5432"
+            - name: DATABASE_NAME
+              value: "employee_service_db"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: employee-service-db
+                  key: user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: employee-service-db
+                  key: password
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: inss-tax-service-db-pv
+  labels:
+    app: inss-tax-service-db-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOncePod
+  hostPath:
+    path: /data/inss-tax-service-db

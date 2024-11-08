@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inss-tax-service-db
+  labels:
+    app: inss-tax-service-db
+spec:
+  ports:
+    - port: 5432
+  clusterIP: None
+  selector:
+    app: inss-tax-service-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: inss-tax-service-db
+spec:
+  selector:
+    matchLabels:
+      app: inss-tax-service-db
+  serviceName: "inss-tax-service-db"
+  replicas: 1
+  minReadySeconds: 15
+  template:
+    metadata:
+      labels:
+        app: inss-tax-service-db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: inss-tax-service-db
+          image: postgres:17.0
+          env:
+            - name: POSTGRES_DB
+              value: "inss_tax_service_db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: inss-tax-service-db
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inss-tax-service-db
+                  key: password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: "/var/lib/postgresql/data"
+            - name: ddl
+              mountPath: "/docker-entrypoint-initdb.d"
+      volumes:
+        - name: ddl
+          configMap:
+            name: inss-tax-service-db-configmap
+            items:
+              - key: "ddl.sql"
+                path: "ddl.sql"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOncePod" ]
+        storageClassName: ""
+        selector:
+          matchLabels:
+            app: inss-tax-service-db-pv
+        resources:
+          requests:
+            storage: 2Gi

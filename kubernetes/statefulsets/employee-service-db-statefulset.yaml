@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-service-db
+  labels:
+    app: employee-service-db
+spec:
+  ports:
+    - port: 5432
+  clusterIP: None
+  selector:
+    app: employee-service-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: employee-service-db
+spec:
+  selector:
+    matchLabels:
+      app: employee-service-db
+  serviceName: "employee-service-db"
+  replicas: 1
+  minReadySeconds: 15
+  template:
+    metadata:
+      labels:
+        app: employee-service-db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: employee-service-db
+          image: postgres:17.0
+          env:
+            - name: POSTGRES_DB
+              value: "employee_service_db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: employee-service-db
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: employee-service-db
+                  key: password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: "/var/lib/postgresql/data"
+            - name: ddl
+              mountPath: "/docker-entrypoint-initdb.d"
+      volumes:
+        - name: ddl
+          configMap:
+            name: employee-service-db-configmap
+            items:
+              - key: "ddl.sql"
+                path: "ddl.sql"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOncePod" ]
+        storageClassName: ""
+        selector:
+          matchLabels:
+            app: employee-service-db-pv
+        resources:
+          requests:
+            storage: 2Gi

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payroll-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payroll-service
+  template:
+    metadata:
+      labels:
+        app: payroll-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: payroll-service
+          image: localhost:32000/ps-k8s-payroll-service:1.0
+          imagePullPolicy: Always
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://payroll-service-db:5432"
+            - name: DATABASE_NAME
+              value: "payroll_service_db"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: payroll-service-db
+                  key: user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payroll-service-db
+                  key: password
+            - name: EMPLOYEE_SERVICE_URL
+              value: "http://employee-service:8080"
+            - name: INSS_TAX_SERVICE_URL
+              value: "http://inss-tax-service:8080"
+            - name: INCOME_TAX_SERVICE_URL
+              value: "http://income-tax-service:8080"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9092,kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9092,kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9092"
+            - name: KAFKA_SASL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-security
+                  key: sasl-username
+            - name: KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-security
+                  key: sasl-password
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always

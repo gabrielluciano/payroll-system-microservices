@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: payroll-service-db-pv
+  labels:
+    app: payroll-service-db-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOncePod
+  hostPath:
+    path: /data/payroll-service-db

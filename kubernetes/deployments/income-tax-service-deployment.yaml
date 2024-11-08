@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: income-tax-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: income-tax-service
+  template:
+    metadata:
+      labels:
+        app: income-tax-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: income-tax-service
+          image: localhost:32000/ps-k8s-income-tax-service:1.0
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://income-tax-service-db:5432"
+            - name: DATABASE_NAME
+              value: "income_tax_service_db"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: income-tax-service-db
+                  key: user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: income-tax-service-db
+                  key: password
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
