@@ -270,7 +270,7 @@ services:
       - AUTHZ_SERVER_ISSUER_URI=https://keycloak:8443/realms/payroll-system
       - AUTHZ_SERVER_JWK_SET_URI=https://keycloak:8443/realms/payroll-system/protocol/openid-connect/certs
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
       - discovery-server
       - keycloak
@@ -304,5 +304,3 @@ volumes:
   kafka-broker-3-secrets:
   kafka-broker-3-data:
   kafka-broker-3-config:
-
-
