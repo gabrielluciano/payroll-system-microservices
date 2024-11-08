@@ -39,9 +39,15 @@ eureka:
       defaultZone: http://${security.username}:${security.password}@${EUREKA_SERVER_HOST}:8761/eureka/
 
 services:
-  employeeServiceName: employee-service
-  incomeTaxServiceName: income-tax-service
-  inssTaxServiceName: inss-tax-service
+  employeeService:
+    name: employee-service
+    url: ""
+  incomeTaxService:
+    name: income-tax-service
+    url: ""
+  inssTaxService:
+    name: inss-tax-service
+    url: ""
 
 springdoc:
   swagger-ui:

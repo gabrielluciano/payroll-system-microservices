@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.gabrielluciano.payrollservice.domain.model.IncomeTaxRate;
 
-@FeignClient(name = "${services.incomeTaxServiceName}", path = "/income")
+@FeignClient(name = "${services.incomeTaxService.name}", url = "${services.incomeTaxService.url}", path = "/income")
 public interface IncomeTaxServiceClient {
 
     @GetMapping("/tax-rate")

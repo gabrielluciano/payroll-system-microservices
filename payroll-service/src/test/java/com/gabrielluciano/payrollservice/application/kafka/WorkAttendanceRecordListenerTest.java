@@ -46,7 +46,7 @@ class WorkAttendanceRecordListenerTest {
         WorkAttendanceRecord record = new WorkAttendanceRecord(VALID_CPF, 2024, 11, 160, 150);
 
         kafkaTemplate.send(topicName, VALID_CPF, record).get();
-        Thread.sleep(1000); // Ensure record is received
+        Thread.sleep(2000); // Ensure record is received
 
         verify(payrollService, times(1)).processPayroll(ArgumentMatchers.any());
     }

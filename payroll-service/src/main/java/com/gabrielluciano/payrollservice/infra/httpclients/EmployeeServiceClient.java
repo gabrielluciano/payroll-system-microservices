@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.gabrielluciano.payrollservice.domain.dto.EmployeeResponse;
 
-@FeignClient(name = "${services.employeeServiceName}", path = "/employees")
+@FeignClient(name = "${services.employeeService.name}", url = "${services.employeeService.url}", path = "/employees")
 public interface EmployeeServiceClient {
 
     @GetMapping("{cpf}")
