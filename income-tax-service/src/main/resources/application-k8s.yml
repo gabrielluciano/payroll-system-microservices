@@ -2,19 +2,18 @@ spring:
   application:
     name: income-tax-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/income_tax_db
-    username: service
-    password: password
+    url: ${DATABASE_URL}/${DATABASE_NAME}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: none
 
 service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 server:
-  port: 8082
+  port: ${SERVER_PORT}
 
 management:
   endpoints:
@@ -22,16 +21,9 @@ management:
       exposure:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
-security:
-  username: microservice
-  password: password
-
 eureka:
-  instance:
-    instanceId: ${service.instanceId}
   client:
-    serviceUrl:
-      defaultZone: http://${security.username}:${security.password}@localhost:8761/eureka/
+    enabled: false
 
 springdoc:
   swagger-ui:
@@ -39,6 +31,6 @@ springdoc:
   api-docs:
     path: /income/api-docs
 
-#logging:
-#  file:
-#    name: ./logs/${spring.application.name}-log.log
+logging:
+  file:
+    name: ./logs/${spring.application.name}-log.log
