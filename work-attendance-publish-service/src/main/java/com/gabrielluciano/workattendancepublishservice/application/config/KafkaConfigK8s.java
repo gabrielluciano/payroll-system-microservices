@@ -3,7 +3,9 @@ package com.gabrielluciano.workattendancepublishservice.application.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +21,8 @@ import com.gabrielluciano.workattendancepublishservice.domain.model.WorkAttendan
 
 @Configuration
 @EnableKafka
-@Profile("!k8s")
-public class KafkaConfig {
+@Profile("k8s")
+public class KafkaConfigK8s {
 
     @Value("${service.instanceId}")
     private String instanceId;
@@ -36,7 +38,11 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, WorkAttendanceRecord> producerFactory(@Value("${kafka.bootstrapServers}") String bootstrapServers) {
+    public ProducerFactory<String, WorkAttendanceRecord> producerFactory(
+        @Value("${kafka.sasl.username}") String saslUsername,
+        @Value("${kafka.sasl.password}") String saslPassword,
+        @Value("${kafka.bootstrapServers}") String bootstrapServers
+    ) {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.ACKS_CONFIG, "-1");
@@ -46,6 +52,14 @@ public class KafkaConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(JsonSerializer.TYPE_MAPPINGS, "work-attendance-record:" + WorkAttendanceRecord.class.getName());
+
+        // SASL Authentication
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+        props.put(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+        props.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
+            "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";",
+            saslUsername, saslPassword)
+        );
         return new DefaultKafkaProducerFactory<>(props);
     }
 }

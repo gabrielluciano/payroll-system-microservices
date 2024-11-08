@@ -6,10 +6,10 @@ service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 server:
-  port: 8084
+  port: 0
 
 kafka:
-  bootstrapServers: localhost:9092
+  bootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
   topicName: work-attendance-events
 
 management:
@@ -19,15 +19,15 @@ management:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
 security:
-  username: microservice
-  password: password
+  username: ${EUREKA_SECURITY_USERNAME}
+  password: ${EUREKA_SECURITY_PASSWORD}
 
 eureka:
   instance:
     instanceId: ${service.instanceId}
   client:
     serviceUrl:
-      defaultZone: http://${security.username}:${security.password}@localhost:8761/eureka/
+      defaultZone: http://${security.username}:${security.password}@${EUREKA_SERVER_HOST}:8761/eureka/
 
 services:
   employeeService:
@@ -40,6 +40,6 @@ springdoc:
   api-docs:
     path: /work-attendances/api-docs
 
-#logging:
-#  file:
-#    name: ./logs/${spring.application.name}-log.log
+logging:
+  file:
+    name: ./logs/${spring.application.name}-log.log

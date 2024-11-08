@@ -6,11 +6,14 @@ service:
   instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 server:
-  port: 0 # random port
+  port: ${SERVER_PORT}
 
 kafka:
   bootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
   topicName: work-attendance-events
+  sasl:
+    username: ${KAFKA_SASL_USERNAME}
+    password: ${KAFKA_SASL_PASSWORD}
 
 management:
   endpoints:
@@ -18,19 +21,14 @@ management:
       exposure:
         include: "health,info,metrics,env,caches,threaddump,logfile,prometheus"
 
-security:
-  username: ${EUREKA_SECURITY_USERNAME}
-  password: ${EUREKA_SECURITY_PASSWORD}
-
 eureka:
-  instance:
-    instanceId: ${service.instanceId}
   client:
-    serviceUrl:
-      defaultZone: http://${security.username}:${security.password}@${EUREKA_SERVER_HOST}:8761/eureka/
+    enabled: false
 
 services:
-  employeeServiceName: employee-service
+  employeeService:
+    name: employee-service
+    url: ${EMPLOYEE_SERVICE_URL}
 
 springdoc:
   swagger-ui:
